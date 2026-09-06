@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Portal San Pedro Sur — En Vivo</title>
+<meta name="description" content="Portal San Pedro Sur, transmitiendo en vivo las 24 horas.">
+
+<!-- ============ PWA ============ -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b0f14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Portal SP Sur">
+
+<!-- ============ Favicons ============ -->
+<link rel="icon" href="icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+<!-- ============ Open Graph / compartir en redes (WhatsApp, Facebook, etc.) ============
+     IMPORTANTE — leer antes de publicar:
+     WhatsApp y Facebook NECESITAN que og:image y og:url sean URLs ABSOLUTAS
+     (con https:// y tu dominio real). Una ruta relativa como "icons/og-image.jpg"
+     es la razón más común de que la miniatura no aparezca al compartir el link.
+     Reemplaza TODO "https://portal-san-pedro-sur.vercel.app" de esta sección
+     por tu dominio real una vez publicada la web (el mismo dominio que uses
+     en Vercel). Después de publicar, si ya compartiste el link antes y sigue
+     sin aparecer la imagen, es porque WhatsApp guardó en caché la versión vieja:
+     probá el link en https://developers.facebook.com/tools/debug/ y tocá
+     "Scrape Again" para forzar que vuelva a leer la imagen. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Portal San Pedro Sur">
+<meta property="og:title" content="Portal San Pedro Sur — En Vivo">
+<meta property="og:description" content="Portal San Pedro Sur, transmitiendo en vivo las 24 horas.">
+<meta property="og:image" content="https://portal-san-pedro-sur.vercel.app/icons/og-image.jpg">
+<meta property="og:image:secure_url" content="https://portal-san-pedro-sur.vercel.app/icons/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://portal-san-pedro-sur.vercel.app/">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Portal San Pedro Sur — En Vivo">
+<meta name="twitter:description" content="Portal San Pedro Sur, transmitiendo en vivo las 24 horas.">
+<meta name="twitter:image" content="https://portal-san-pedro-sur.vercel.app/icons/og-image.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0b0f14;
+    --bg-1:#161c22;
+    --orange:#ff7a1a;
+    --orange-deep:#e8620f;
+    --steel:#2f8fd1;
+    --ink:#f5f4f0;
+    --ink-dim:#a4acb3;
+    --line:#242c34;
+    --mini-h:74px;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-t: env(safe-area-inset-top, 0px);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+  html,body{
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
+    position:fixed;
+    inset:0;
+    width:100%;
+  }
+
+  body{
+    background:var(--bg-0);
+    color:var(--ink);
+    font-family:'Archivo',sans-serif;
+    touch-action:pan-x;
+  }
+
+  button{font-family:inherit;}
+  img{-webkit-user-drag:none;user-select:none;}
+
+  /* ============================================================
+     PANTALLA DE BIENVENIDA — solo en navegador (no instalada).
+     El navegador bloquea el audio automático, por eso se pide
+     un toque antes de reproducir el intro.
+  ============================================================ */
+  #welcome-gate{
+    position:fixed;inset:0;z-index:1000;
+    background:
+      radial-gradient(120% 80% at 50% 20%, rgba(255,122,26,.25), transparent 60%),
+      var(--bg-0);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:26px;padding:24px;text-align:center;
+    transition:opacity .4s ease, visibility .4s ease;
+  }
+  #welcome-gate.hide{opacity:0;visibility:hidden;pointer-events:none;}
+  .welcome-logo{
+    width:150px;height:150px;border-radius:50%;overflow:hidden;
+    box-shadow:0 0 0 2px var(--orange), 0 0 60px -10px rgba(255,122,26,.75);
+  }
+  .welcome-logo img{width:100%;height:100%;object-fit:cover;}
+  .welcome-title{font-family:'Archivo Black',sans-serif;font-size:24px;letter-spacing:.02em;}
+  .welcome-sub{font-size:13px;color:var(--ink-dim);letter-spacing:.1em;text-transform:uppercase;max-width:280px;}
+  #enter-btn{
+    margin-top:6px;
+    padding:16px 44px;border-radius:999px;border:none;cursor:pointer;
+    background:linear-gradient(135deg, var(--orange), var(--orange-deep));
+    color:#fff;font-family:'Archivo Black',sans-serif;font-size:15px;letter-spacing:.06em;
+    box-shadow:0 14px 30px -10px rgba(255,122,26,.7);
+    transition:transform .15s ease;
+  }
+  #enter-btn:active{transform:scale(.95);}
+
+  /* ============================================================
+     SPLASH / INTRO — logo con animación mientras suena el MP3
+  ============================================================ */
+  #splash-screen{
+    position:fixed;inset:0;z-index:999;
+    background:
+      radial-gradient(120% 80% at 50% 20%, rgba(255,122,26,.30), transparent 60%),
+      var(--bg-0);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:22px;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .55s ease, visibility .55s ease;
+  }
+  #splash-screen.show{opacity:1;visibility:visible;pointer-events:auto;}
+  .splash-logo-wrap{
+    width:156px;height:156px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 0 2px var(--orange), 0 0 60px -10px rgba(255,122,26,.75);
+    overflow:hidden;
+    animation:splash-pop .7s cubic-bezier(.34,1.56,.64,1) both, splash-pulse 1.8s ease-in-out .7s infinite;
+  }
+  .splash-logo-wrap img{width:100%;height:100%;object-fit:cover;}
+  @keyframes splash-pop{
+    0%{transform:scale(.4);opacity:0;}
+    100%{transform:scale(1);opacity:1;}
+  }
+  @keyframes splash-pulse{
+    0%,100%{box-shadow:0 0 0 2px var(--orange), 0 0 40px -10px rgba(255,122,26,.6);}
+    50%{box-shadow:0 0 0 2px var(--orange), 0 0 70px -5px rgba(47,143,209,.85);}
+  }
+  .splash-brand{
+    font-family:'Archivo Black',sans-serif;
+    font-size:22px;letter-spacing:.04em;
+    opacity:0;animation:splash-fade-in .6s ease .35s forwards;
+    text-align:center;
+  }
+  .splash-tagline{
+    font-size:12px;color:var(--ink-dim);letter-spacing:.15em;text-transform:uppercase;
+    opacity:0;animation:splash-fade-in .6s ease .55s forwards;
+  }
+  @keyframes splash-fade-in{
+    from{opacity:0;transform:translateY(6px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .splash-bar{
+    width:120px;height:3px;border-radius:3px;background:var(--line);overflow:hidden;
+    opacity:0;animation:splash-fade-in .5s ease .75s forwards;
+  }
+  .splash-bar span{
+    display:block;height:100%;width:40%;background:var(--orange);
+    animation:splash-loading 1.1s ease-in-out infinite;
+  }
+  @keyframes splash-loading{
+    0%{transform:translateX(-100%);}
+    100%{transform:translateX(350%);}
+  }
+  /* Aviso discreto de "toca para continuar" si el navegador bloquea el audio
+     incluso estando instalada como app */
+  .splash-tap-fallback{
+    margin-top:4px;font-size:12px;color:var(--steel);letter-spacing:.06em;
+    opacity:0;visibility:hidden;transition:opacity .3s ease;
+  }
+  .splash-tap-fallback.show{opacity:1;visibility:visible;}
+
+  /* ============================================================
+     VISTA 1 — INICIO (portada a pantalla completa)
+  ============================================================ */
+  #home-view{
+    position:fixed;
+    inset:0;
+    height:100dvh;
+    display:flex;
+    flex-direction:column;
+    background:
+      radial-gradient(130% 90% at 15% 100%, rgba(47,143,209,.18), transparent 55%),
+      radial-gradient(120% 70% at 85% 0%, rgba(255,122,26,.25), transparent 60%),
+      var(--bg-0);
+    padding-bottom: calc(var(--mini-h) + var(--safe-b));
+    padding-top: var(--safe-t);
+    overflow:hidden;
+  }
+  .grain{
+    position:absolute;inset:0;z-index:1;pointer-events:none;
+    background-image:repeating-linear-gradient(115deg, rgba(255,255,255,.02) 0 2px, transparent 2px 46px);
+  }
+
+  /* Foto de la modelo — fija al costado derecho, apoyada justo
+     arriba de la barra del reproductor (nunca detrás de ella) */
+  .model-photo{
+    position:absolute;
+    z-index:2;
+    right:0;
+    bottom: calc(var(--mini-h) + var(--safe-b));
+    height:94vh;
+    max-width:46%;
+    width:auto;
+    object-fit:contain;
+    object-position:bottom right;
+    pointer-events:none;
+    -webkit-mask-image:linear-gradient(to top, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
+    mask-image:linear-gradient(to top, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
+  }
+  @media (max-width:680px){
+    .model-photo{
+      height:86vh;
+      max-width:92%;
+      right:0;
+    }
+  }
+  @media (max-height:640px){
+    .model-photo{height:78vh;}
+  }
+
+  header{
+    position:relative;z-index:3;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:22px clamp(20px,5vw,64px);
+    gap:12px;
+    flex-shrink:0;
+  }
+  .brand{display:flex;align-items:center;gap:10px;min-width:0;}
+  .brand-mark{
+    width:44px;height:44px;border-radius:50%;background:var(--bg-1);
+    border:2px solid var(--orange);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Archivo Black',sans-serif;font-size:13px;flex-shrink:0;
+    overflow:hidden;
+  }
+  .brand-mark img{width:100%;height:100%;object-fit:cover;}
+  .brand-name{font-family:'Archivo Black',sans-serif;font-size:15px;letter-spacing:.02em;white-space:nowrap;}
+
+  /* Botón instalar PWA */
+  #install-btn{
+    display:none;
+    align-items:center;gap:8px;
+    padding:10px 16px;border-radius:999px;
+    background:var(--orange);color:#fff;
+    font-weight:800;font-size:12.5px;letter-spacing:.02em;
+    border:none;cursor:pointer;flex-shrink:0;
+    box-shadow:0 10px 24px -10px rgba(255,122,26,.8);
+    transition:transform .15s ease;
+    white-space:nowrap;
+  }
+  #install-btn:active{transform:scale(.95);}
+  #install-btn svg{width:16px;height:16px;flex-shrink:0;}
+  #install-btn.show{display:inline-flex;}
+
+  .hero{
+    position:relative;z-index:3;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    gap:14px;
+    padding:24px clamp(20px,6vw,64px) 26px;
+    min-height:0;
+    max-width:600px;
+  }
+
+  .live-pill{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 18px 8px 14px;border-radius:999px;
+    background:var(--orange);
+    font-size:13px;letter-spacing:.03em;color:#fff;font-weight:800;
+    width:fit-content;
+  }
+  .live-dot{
+    width:8px;height:8px;border-radius:50%;background:#fff;
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(255,255,255,.55);}
+    70%{box-shadow:0 0 0 9px rgba(255,255,255,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,255,255,0);}
+  }
+
+  .hero h1{
+    font-family:'Archivo Black',sans-serif;
+    font-size:clamp(30px,8vw,46px);
+    letter-spacing:.005em;
+    line-height:1.02;
+    max-width:14ch;
+    -webkit-text-stroke:1.5px rgba(11,15,20,.5);
+    text-shadow:0 2px 4px rgba(0,0,0,.5), 0 4px 24px rgba(0,0,0,.55), 0 0 2px rgba(0,0,0,.6);
+  }
+  .hero h1 .accent{
+    color:var(--orange);
+    -webkit-text-stroke:1.5px rgba(255,255,255,.4);
+    text-shadow:0 2px 4px rgba(0,0,0,.55), 0 4px 26px rgba(0,0,0,.6);
+  }
+  .hero p.tagline{
+    color:var(--ink-dim);font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    text-shadow:0 1px 3px rgba(0,0,0,.7), 0 2px 10px rgba(0,0,0,.5);
+  }
+
+  .social-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
+  .social-row a{
+    width:42px;height:42px;border-radius:50%;
+    background:rgba(245,244,240,.06);
+    border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--ink);text-decoration:none;
+    transition:border-color .2s,color .2s,transform .15s,background .2s;
+  }
+  .social-row a:hover{border-color:var(--orange);color:var(--orange);transform:translateY(-2px);}
+  .social-row svg{width:18px;height:18px;}
+
+  /* ---- Mini reproductor (barra fija inferior, funcional) ---- */
+  #mini-bar{
+    position:fixed;
+    left:0;right:0;
+    bottom:0;
+    height:calc(var(--mini-h) + var(--safe-b));
+    padding-bottom:var(--safe-b);
+    background:#10141a;
+    border-top:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding-left:16px;padding-right:16px;
+    cursor:pointer;
+    z-index:20;
+    box-shadow:0 -8px 30px -10px rgba(0,0,0,.5);
+  }
+  #mini-bar .mini-mark{
+    width:44px;height:44px;border-radius:50%;flex-shrink:0;
+    background:var(--bg-0);border:2px solid var(--orange);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Archivo Black',sans-serif;font-size:10px;
+    overflow:hidden;
+  }
+  #mini-bar .mini-mark img{width:100%;height:100%;object-fit:cover;}
+  #mini-bar .mini-mark.spinning{animation:spin 9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .mini-info{flex:1;min-width:0;overflow:hidden;}
+  .mini-marquee{white-space:nowrap;}
+  .mini-info .t1{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mini-info .t2{font-size:12px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* Ecualizador animado */
+  .eq{display:flex;align-items:flex-end;gap:3px;height:22px;flex-shrink:0;}
+  .eq span{
+    width:3px;border-radius:2px;background:var(--steel);
+    animation:eqbar 1s ease-in-out infinite;
+    height:6px;
+  }
+  .eq.paused span{animation-play-state:paused;height:4px;background:var(--ink-dim);}
+  .eq span:nth-child(1){animation-duration:.8s;animation-delay:0s;}
+  .eq span:nth-child(2){animation-duration:1.1s;animation-delay:.1s;}
+  .eq span:nth-child(3){animation-duration:.7s;animation-delay:.15s;}
+  .eq span:nth-child(4){animation-duration:1s;animation-delay:.05s;}
+  .eq span:nth-child(5){animation-duration:.9s;animation-delay:.2s;}
+  @keyframes eqbar{
+    0%,100%{height:5px;}
+    50%{height:22px;}
+  }
+
+  #mini-play{
+    width:40px;height:40px;border-radius:50%;flex-shrink:0;
+    background:var(--orange);border:none;color:#fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+  #mini-play svg{width:16px;height:16px;}
+
+  #mini-vol-btn{
+    width:36px;height:36px;border-radius:50%;flex-shrink:0;
+    background:none;border:none;color:var(--ink-dim);cursor:pointer;
+    display:none;align-items:center;justify-content:center;
+  }
+  #mini-vol-btn svg{width:18px;height:18px;}
+  @media(min-width:480px){ #mini-vol-btn{display:flex;} }
+
+  /* ============================================================
+     VISTA 2 — REPRODUCTOR A PANTALLA COMPLETA
+  ============================================================ */
+  #player-view{
+    position:fixed;
+    inset:0;
+    background:var(--bg-0);
+    z-index:50;
+    display:flex;
+    flex-direction:column;
+    transform:translateY(100%);
+    transition:transform .38s cubic-bezier(.4,0,.2,1);
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    padding-top:var(--safe-t);
+  }
+  #player-view.open{transform:translateY(0);}
+
+  .player-top{
+    display:flex;align-items:center;
+    padding:18px clamp(18px,5vw,40px);
+  }
+  #back-btn{
+    background:none;border:none;color:var(--ink);cursor:pointer;
+    width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;transition:background .15s;
+  }
+  #back-btn:hover{background:rgba(255,255,255,.06);}
+  #back-btn svg{width:22px;height:22px;}
+
+  .player-body{
+    flex:1;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;gap:22px;
+    padding:10px 24px 50px;
+  }
+
+  .disc-wrap{position:relative;width:min(60vw,270px);aspect-ratio:1/1;}
+  .disc{
+    width:100%;height:100%;border-radius:50%;
+    background:conic-gradient(from 220deg, var(--bg-1), #171b21 30%, var(--bg-1) 55%, #151920 80%, var(--bg-1));
+    border:6px solid #1b2027;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 30px 60px -20px rgba(255,122,26,.35), inset 0 0 0 1px rgba(255,255,255,.03);
+  }
+  .disc.spinning{animation:spin 9s linear infinite;}
+  .disc-core{
+    width:44%;height:44%;border-radius:50%;background:var(--bg-0);
+    border:3px solid var(--orange);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Archivo Black',sans-serif;font-size:clamp(15px,4vw,20px);
+    overflow:hidden;
+  }
+  .disc-core img{width:100%;height:100%;object-fit:cover;}
+
+  .station-info h1{font-family:'Archivo Black',sans-serif;font-size:clamp(22px,5.5vw,30px);}
+  .station-info p{margin-top:6px;color:var(--ink-dim);font-size:14px;}
+
+  #track-title{font-size:13px;color:var(--steel);font-weight:600;min-height:16px;letter-spacing:.02em;}
+
+  .on-air-banner{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 22px;border-radius:999px;
+    background:var(--orange);color:#fff;
+    font-weight:800;font-size:13px;letter-spacing:.04em;
+  }
+
+  .controls{display:flex;align-items:center;justify-content:center;gap:26px;}
+  .btn-round{
+    background:none;border:none;color:var(--ink);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .15s ease,color .15s ease;
+  }
+  .btn-round:hover{color:var(--orange);}
+  .btn-round:active{transform:scale(.92);}
+  #play-btn{
+    width:76px;height:76px;border-radius:50%;background:var(--orange);color:#fff;
+    box-shadow:0 12px 30px -10px rgba(255,122,26,.7);
+  }
+  #play-btn:hover{color:#fff;transform:scale(1.04);}
+  #play-btn svg{width:28px;height:28px;}
+  .btn-small svg{width:22px;height:22px;}
+
+  .volume-row{display:flex;align-items:center;gap:10px;width:100%;max-width:220px;}
+  input[type=range]{
+    -webkit-appearance:none;width:100%;height:4px;border-radius:4px;
+    background:var(--line);outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+    background:var(--steel);border:2px solid var(--bg-0);box-shadow:0 0 0 1px var(--steel);cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;background:var(--steel);
+    border:2px solid var(--bg-0);cursor:pointer;
+  }
+
+  #status-msg{font-size:12px;color:var(--ink-dim);min-height:14px;}
+
+  @media (max-width:420px){
+    header{padding:16px 16px;}
+    .hero{gap:12px;padding-bottom:20px;}
+    .controls{gap:18px;}
+    #install-btn span{display:none;}
+    #install-btn{padding:10px;width:38px;height:38px;justify-content:center;border-radius:50%;}
+  }
+
+  /* Pantallas muy bajas (móviles pequeños en horizontal, etc.) */
+  @media (max-height:640px){
+    .hero h1{font-size:clamp(24px,7vw,34px);}
+    .social-row a{width:38px;height:38px;}
+    header{padding-top:14px;padding-bottom:8px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ PANTALLA DE BIENVENIDA (solo navegador) ============ -->
+<div id="welcome-gate">
+  <div class="welcome-logo">
+    <img src="icons/icon-192.png" alt="Portal San Pedro Sur">
+  </div>
+  <div class="welcome-title">PORTAL SAN PEDRO SUR</div>
+  <div class="welcome-sub">Tocá entrar para escuchar en vivo</div>
+  <button id="enter-btn">ENTRAR</button>
+</div>
+
+<!-- ============ SPLASH / INTRO (logo + audio de bienvenida) ============ -->
+<div id="splash-screen">
+  <div class="splash-logo-wrap">
+    <img src="icons/icon-192.png" alt="Portal San Pedro Sur">
+  </div>
+  <div class="splash-brand">PORTAL SAN PEDRO SUR</div>
+  <div class="splash-tagline">Radio online · En vivo</div>
+  <div class="splash-bar"><span></span></div>
+  <div class="splash-tap-fallback" id="splash-tap-fallback">Tocá la pantalla para continuar</div>
+</div>
+
+<!-- ============ VISTA 1: INICIO ============ -->
+<div id="home-view">
+
+  <div class="grain"></div>
+  <video class="model-photo" src="assets/modelo-video.mp4" poster="assets/modelo-poster.jpg" autoplay muted loop playsinline></video>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark"><img src="icons/icon-192.png" alt="Portal San Pedro Sur"></div>
+      <div class="brand-name">PORTAL SP SUR</div>
+    </div>
+    <button id="install-btn" aria-label="Instalar aplicación">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></svg>
+      <span>Instalar App</span>
+    </button>
+  </header>
+
+  <div class="hero">
+    <span class="live-pill"><span class="live-dot"></span>EN DIRECTO</span>
+    <h1>PORTAL <span class="accent">SAN PEDRO SUR</span></h1>
+    <p class="tagline">Radio online · En vivo 24 horas</p>
+
+    <div class="social-row" id="social-row">
+      <a href="#" target="_blank" rel="noopener" data-social="facebook" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12"/></svg></a>
+      <a href="#" target="_blank" rel="noopener" data-social="whatsapp" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.38 1.26 4.8L2 22l5.44-1.36a9.9 9.9 0 0 0 4.6 1.14h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.87 9.87 0 0 0 12.04 2zm5.78 14.2c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.02.28-3.42-.72-2.9-1.2-4.77-4.15-4.92-4.34-.14-.2-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.78-.36.2 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.32.02.51-.1.2-.15.32-.3.5-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.29.75 1.24 1.62 2.01 1.12 1 2.06 1.31 2.35 1.46.29.15.46.13.63-.08.17-.2.72-.84.91-1.13.19-.29.38-.24.63-.15.25.1 1.61.76 1.89.9.28.14.46.21.53.33.07.12.07.68-.17 1.35z"/></svg></a>
+      <a href="#" target="_blank" rel="noopener" data-social="instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+      <a href="#" target="_blank" rel="noopener" data-social="tiktok" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 2h-3.2v13.6a3 3 0 1 1-2.4-2.94V9.3a6.2 6.2 0 1 0 5.6 6.17V8.4a7.6 7.6 0 0 0 4.4 1.4V6.6a4.4 4.4 0 0 1-4.4-4.4z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- Mini reproductor: barra inferior fija, siempre visible y funcional -->
+<div id="mini-bar">
+  <div class="mini-mark" id="mini-mark"><img src="icons/icon-192.png" alt="Portal San Pedro Sur"></div>
+  <div class="mini-info" id="mini-open-target">
+    <div class="t1 mini-marquee" id="mini-title">Portal San Pedro Sur</div>
+    <div class="t2" id="mini-subtitle">Toca para abrir el reproductor</div>
+  </div>
+  <div class="eq paused" id="mini-eq">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <button id="mini-vol-btn" aria-label="Silenciar">
+    <svg id="mini-vol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+  </button>
+  <button id="mini-play" aria-label="Reproducir">
+    <svg id="mini-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+    <svg id="mini-pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="5" y="3" width="5" height="18"></rect><rect x="14" y="3" width="5" height="18"></rect></svg>
+  </button>
+</div>
+
+<!-- ============ VISTA 2: REPRODUCTOR COMPLETO ============ -->
+<div id="player-view">
+  <div class="player-top">
+    <button id="back-btn" aria-label="Volver">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+  </div>
+
+  <div class="player-body">
+
+    <div class="disc-wrap">
+      <div class="disc" id="disc">
+        <div class="disc-core"><img src="icons/icon-192.png" alt="Portal San Pedro Sur"></div>
+      </div>
+    </div>
+
+    <div class="station-info">
+      <h1>Portal San Pedro Sur</h1>
+      <p>Radio online · En vivo 24 horas</p>
+      <div id="track-title">Cargando transmisión…</div>
+    </div>
+
+    <span class="on-air-banner">SONANDO EN VIVO</span>
+
+    <div class="controls">
+      <button class="btn-round btn-small" id="mute-btn" title="Silenciar" aria-label="Silenciar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+      </button>
+
+      <button class="btn-round" id="play-btn" title="Reproducir" aria-label="Reproducir">
+        <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+        <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="5" y="3" width="5" height="18"></rect><rect x="14" y="3" width="5" height="18"></rect></svg>
+      </button>
+
+      <button class="btn-round btn-small" id="reload-btn" title="Reconectar" aria-label="Reconectar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+      </button>
+    </div>
+
+    <div class="volume-row">
+      <span>🔈</span>
+      <input type="range" id="volume" min="0" max="100" value="80">
+    </div>
+
+    <div id="status-msg">Sin transmisión configurada</div>
+  </div>
+</div>
+
+<audio id="audio" preload="none"></audio>
+<audio id="intro-audio" preload="auto" src="assets/intro.mp3"></audio>
+
+<script>
+  /* ================================================================
+     CONFIGURACIÓN — edita aquí la URL del stream y las redes sociales
+     ================================================================ */
+  const CONFIG = {
+    STREAM_URL: "https://stream.espora.org/portalsanpedrosur",
+    STATION_NAME: "Portal San Pedro Sur",
+    SOCIAL: {
+      facebook:  "https://www.facebook.com/share/18RBnfs6T3/",
+      whatsapp:  "https://wa.me/595986436870",
+      instagram: "https://www.instagram.com/portal_san_pedro_sur?stkn=bXF5Mm94YXdodDd5",
+      tiktok:    "https://www.tiktok.com/@elatrapantedelnorte?_r=1&_t=ZN-99VLt03f73O"
+    }
+  };
+
+  // Aplica las URLs de redes sociales configuradas arriba
+  document.querySelectorAll('#social-row a[data-social]').forEach(a => {
+    const url = CONFIG.SOCIAL[a.dataset.social];
+    if (url) a.href = url;
+  });
+
+  const audio        = document.getElementById('audio');
+
+  const playerView   = document.getElementById('player-view');
+  const backBtn      = document.getElementById('back-btn');
+  const playBtn      = document.getElementById('play-btn');
+  const playIcon     = document.getElementById('play-icon');
+  const pauseIcon    = document.getElementById('pause-icon');
+  const muteBtn      = document.getElementById('mute-btn');
+  const volSlider    = document.getElementById('volume');
+  const reloadBtn    = document.getElementById('reload-btn');
+  const disc         = document.getElementById('disc');
+  const statusMsg    = document.getElementById('status-msg');
+  const trackTitle   = document.getElementById('track-title');
+
+  const miniBar         = document.getElementById('mini-bar');
+  const miniPlay         = document.getElementById('mini-play');
+  const miniPlayIcon     = document.getElementById('mini-play-icon');
+  const miniPauseIcon    = document.getElementById('mini-pause-icon');
+  const miniMark         = document.getElementById('mini-mark');
+  const miniSubtitle     = document.getElementById('mini-subtitle');
+  const miniEq           = document.getElementById('mini-eq');
+  const miniVolBtn       = document.getElementById('mini-vol-btn');
+
+  audio.volume = 0.8;
+
+  function openPlayerView(){
+    playerView.classList.add('open');
+  }
+  function closePlayerView(){
+    playerView.classList.remove('open');
+  }
+
+  miniBar.addEventListener('click', (e) => {
+    if(e.target.closest('#mini-play')){
+      togglePlay();
+      return;
+    }
+    if(e.target.closest('#mini-vol-btn')){
+      toggleMute();
+      return;
+    }
+    openPlayerView();
+  });
+
+  backBtn.addEventListener('click', closePlayerView);
+
+  function setPlayingUI(isPlaying){
+    playIcon.style.display      = isPlaying ? 'none'  : 'block';
+    pauseIcon.style.display     = isPlaying ? 'block' : 'none';
+    miniPlayIcon.style.display  = isPlaying ? 'none'  : 'block';
+    miniPauseIcon.style.display = isPlaying ? 'block' : 'none';
+    disc.classList.toggle('spinning', isPlaying);
+    miniMark.classList.toggle('spinning', isPlaying);
+    miniEq.classList.toggle('paused', !isPlaying);
+  }
+
+  // Evita que el navegador reutilice una conexión vieja/fallida en caché:
+  // cada vez que cargamos el stream le agregamos un parámetro único.
+  function freshStreamUrl(){
+    const sep = CONFIG.STREAM_URL.includes('?') ? '&' : '?';
+    return CONFIG.STREAM_URL + sep + '_=' + Date.now();
+  }
+
+  function loadStream(){
+    if(!CONFIG.STREAM_URL){
+      statusMsg.textContent = 'Sin transmisión configurada';
+      trackTitle.textContent = 'Agrega la URL del stream en CONFIG.STREAM_URL';
+      return false;
+    }
+    audio.src = freshStreamUrl();
+    audio.load();
+    return true;
+  }
+
+  // "playSession" identifica cada intento de reproducir. Si el usuario
+  // pausa mientras un intento sigue conectando/reintentando en segundo
+  // plano, ese intento queda "viejo" y se cancela solo — así una pausa
+  // manual nunca vuelve a reproducirse sola.
+  let playSession = 0;
+
+  function attemptPlay(isRetry, mySession){
+    audio.play()
+      .then(() => {
+        if(mySession !== playSession){
+          // El usuario pausó mientras esto conectaba: no reanudar.
+          audio.pause();
+          return;
+        }
+        statusMsg.textContent = 'Transmitiendo en vivo';
+        trackTitle.textContent = CONFIG.STATION_NAME + ' — En Vivo';
+        miniSubtitle.textContent = 'Sonando en vivo';
+        setPlayingUI(true);
+      })
+      .catch(() => {
+        if(mySession !== playSession) return; // cancelado por una pausa manual
+        if(!isRetry){
+          // Primer intento falló (a veces por una conexión en caché) —
+          // reintenta una vez de inmediato con una URL nueva antes de rendirse.
+          statusMsg.textContent = 'Reintentando…';
+          miniSubtitle.textContent = 'Reintentando…';
+          loadStream();
+          setTimeout(() => {
+            if(mySession === playSession) attemptPlay(true, mySession);
+          }, 400);
+        } else {
+          statusMsg.textContent = 'No se pudo conectar al stream';
+          miniSubtitle.textContent = 'No se pudo conectar';
+        }
+      });
+  }
+
+  function togglePlay(){
+    if(audio.paused){
+      playSession++;
+      const mySession = playSession;
+      loadStream();
+      statusMsg.textContent = 'Conectando…';
+      miniSubtitle.textContent = 'Conectando…';
+      attemptPlay(false, mySession);
+    } else {
+      playSession++; // invalida cualquier intento de conexión pendiente
+      audio.pause();
+      statusMsg.textContent = 'Pausado';
+      miniSubtitle.textContent = 'Pausado';
+      setPlayingUI(false);
+    }
+  }
+
+  playBtn.addEventListener('click', togglePlay);
+  // NOTA: el botón "mini-play" y "mini-vol-btn" de la barra pequeña
+  // NO llevan su propio addEventListener acá — ya están cubiertos por
+  // el listener delegado de #mini-bar más arriba. Agregar un segundo
+  // listener directo aquí duplicaba el clic (pausaba y volvía a
+  // reproducir en el mismo toque).
+
+  reloadBtn.addEventListener('click', () => {
+    const wasPlaying = !audio.paused;
+    playSession++;
+    const mySession = playSession;
+    audio.pause();
+    setPlayingUI(false);
+    if(loadStream() && wasPlaying){
+      statusMsg.textContent = 'Reconectando…';
+      miniSubtitle.textContent = 'Reconectando…';
+      attemptPlay(false, mySession);
+    }
+  });
+
+  volSlider.addEventListener('input', (e) => {
+    audio.volume = e.target.value / 100;
+    audio.muted = false;
+  });
+
+  let lastVolume = 80;
+  function toggleMute(){
+    if(audio.muted || audio.volume === 0){
+      audio.muted = false;
+      audio.volume = lastVolume / 100;
+      volSlider.value = lastVolume;
+    } else {
+      lastVolume = volSlider.value;
+      audio.muted = true;
+      audio.volume = 0;
+      volSlider.value = 0;
+    }
+  }
+  muteBtn.addEventListener('click', toggleMute);
+  // mini-vol-btn ya está cubierto por el listener delegado de #mini-bar
+  // (ver nota más arriba sobre el bug del doble clic).
+
+  audio.addEventListener('waiting', () => { statusMsg.textContent = 'Cargando…'; });
+  audio.addEventListener('playing', () => { statusMsg.textContent = 'Transmitiendo en vivo'; });
+
+  /* ================================================================
+     BLOQUEO DE SCROLL / REBOTE — asegura que la pantalla de inicio
+     nunca se pueda deslizar hacia abajo en navegadores móviles.
+     El reproductor de pantalla completa sí permite scroll interno
+     por si el contenido no cabe en pantallas muy pequeñas.
+     ================================================================ */
+  document.addEventListener('touchmove', (e) => {
+    if(!e.target.closest('#player-view') && !e.target.closest('input[type=range]')){
+      e.preventDefault();
+    }
+  }, { passive:false });
+
+  /* ================================================================
+     BIENVENIDA + SPLASH + AUDIO DE INTRO
+     -----------------------------------------------------------------
+     - En NAVEGADOR (no instalada): se muestra la pantalla de bienvenida
+       con el botón "ENTRAR". Al tocarlo, arranca el splash con el logo
+       y se reproduce el MP3 de intro. Cuando el audio termina, el
+       splash se oculta y aparece el reproductor.
+     - Instalada como APP (PWA / modo standalone): se salta la pantalla
+       de "ENTRAR" y arranca directo el splash + audio de intro.
+     ================================================================ */
+  const welcomeGate   = document.getElementById('welcome-gate');
+  const enterBtn      = document.getElementById('enter-btn');
+  const splash        = document.getElementById('splash-screen');
+  const introAudio    = document.getElementById('intro-audio');
+  const tapFallback   = document.getElementById('splash-tap-fallback');
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                        || window.navigator.standalone === true;
+
+  let splashDone = false;
+  function finishSplash(){
+    if(splashDone) return;
+    splashDone = true;
+    splash.classList.remove('show');
+  }
+
+  function startIntro(){
+    splash.classList.add('show');
+    introAudio.currentTime = 0;
+    const playPromise = introAudio.play();
+    if(playPromise && playPromise.catch){
+      playPromise.catch(() => {
+        // El navegador bloqueó el audio automático (puede pasar incluso
+        // en modo instalado). Mostramos un toque de respaldo para
+        // continuar sin dejar a la persona esperando indefinidamente.
+        tapFallback.classList.add('show');
+        const resumeOnTap = () => {
+          tapFallback.classList.remove('show');
+          introAudio.play().catch(() => {});
+          splash.removeEventListener('click', resumeOnTap);
+        };
+        splash.addEventListener('click', resumeOnTap);
+      });
+    }
+  }
+
+  introAudio.addEventListener('ended', finishSplash);
+  introAudio.addEventListener('error', finishSplash);
+  // Respaldo por si el audio no carga o el evento tarda demasiado
+  setTimeout(finishSplash, 15000);
+
+  if(isStandalone){
+    // App instalada: se salta el botón "Entrar" y arranca directo
+    welcomeGate.style.display = 'none';
+    startIntro();
+  } else {
+    // Navegador normal: primero pide el toque (requerido para poder
+    // reproducir audio con sonido)
+    enterBtn.addEventListener('click', () => {
+      welcomeGate.classList.add('hide');
+      startIntro();
+    });
+  }
+
+  /* ================================================================
+     PWA — instalación y service worker
+     ================================================================ */
+  const installBtn = document.getElementById('install-btn');
+  let deferredPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.classList.add('show');
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if(!deferredPrompt) return;
+    installBtn.classList.remove('show');
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installBtn.classList.remove('show');
+    deferredPrompt = null;
+  });
+
+  // Si ya corre instalada (standalone), no mostrar el botón
+  if (isStandalone) {
+    installBtn.classList.remove('show');
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        // Revisa si hay una nueva versión disponible y la activa de inmediato
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'activated') {
+              // La nueva versión ya está activa; el próximo reload la usará
+            }
+          });
+        });
+      }).catch(err => console.warn('SW registration failed:', err));
+    });
+
+    // Si el service worker cambia (nueva versión tomó control), recarga una vez
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    });
+  }
+</script>
+
+</body>
+</html>
