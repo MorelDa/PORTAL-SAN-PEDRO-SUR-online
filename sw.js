@@ -7,7 +7,7 @@
   de quedarse con una copia vieja guardada en caché.
   ---------------------------------------------------------------
 */
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v31';
 const CACHE_NAME = `portal-san-pedro-sur-${CACHE_VERSION}`;
 
 // Archivos "estáticos" que se pueden guardar en caché sin problema
@@ -15,6 +15,13 @@ const PRECACHE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './assets/noticias/noticia-1.webp',
+  './assets/noticias/noticia-2.webp',
+  './assets/noticias/noticia-3.webp',
+  './assets/noticias/noticia-4.webp',
+  './assets/noticias/noticia-5.webp',
+  './assets/noticias/noticia-6.webp',
+  './assets/noticias/noticia-7.webp',
   './icons/icon-192.png',
   './icons/icon-384.png',
   './icons/icon-512.png',
@@ -22,9 +29,6 @@ const PRECACHE_ASSETS = [
   './icons/favicon-32x32.png',
   './icons/favicon-16x16.png',
   './icons/favicon.ico',
-  './assets/modelo-video.mp4',
-  './assets/modelo-poster.jpg',
-  './assets/intro.mp3'
 ];
 
 self.addEventListener('install', (event) => {

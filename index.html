@@ -1,564 +1,896 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-tema="oscuro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Portal San Pedro Sur — En Vivo</title>
-<meta name="description" content="Portal San Pedro Sur, transmitiendo en vivo las 24 horas.">
+<meta name="description" content="Portal San Pedro Sur, la radio de Guajayví, Paraguay. Música y noticias en directo las 24 horas.">
 
-<!-- ============ PWA ============ -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0b0f14">
+<meta name="theme-color" content="#f97316">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Portal SP Sur">
 
-<!-- ============ Favicons ============ -->
 <link rel="icon" href="icons/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 
-<!-- ============ Open Graph / compartir en redes (WhatsApp, Facebook, etc.) ============
-     IMPORTANTE — leer antes de publicar:
-     WhatsApp y Facebook NECESITAN que og:image y og:url sean URLs ABSOLUTAS
-     (con https:// y tu dominio real). Una ruta relativa como "icons/og-image.jpg"
-     es la razón más común de que la miniatura no aparezca al compartir el link.
-     Reemplaza TODO "https://portal-san-pedro-sur.vercel.app" de esta sección
-     por tu dominio real una vez publicada la web (el mismo dominio que uses
-     en Vercel). Después de publicar, si ya compartiste el link antes y sigue
-     sin aparecer la imagen, es porque WhatsApp guardó en caché la versión vieja:
-     probá el link en https://developers.facebook.com/tools/debug/ y tocá
-     "Scrape Again" para forzar que vuelva a leer la imagen. -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Portal San Pedro Sur">
 <meta property="og:title" content="Portal San Pedro Sur — En Vivo">
-<meta property="og:description" content="Portal San Pedro Sur, transmitiendo en vivo las 24 horas.">
+<meta property="og:description" content="La radio de San Pedro del Sur. Música y noticias en directo las 24 horas.">
 <meta property="og:image" content="https://portal-san-pedro-sur.vercel.app/icons/og-image.jpg">
-<meta property="og:image:secure_url" content="https://portal-san-pedro-sur.vercel.app/icons/og-image.jpg">
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
 <meta property="og:url" content="https://portal-san-pedro-sur.vercel.app/">
-
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Portal San Pedro Sur — En Vivo">
-<meta name="twitter:description" content="Portal San Pedro Sur, transmitiendo en vivo las 24 horas.">
+<meta name="twitter:description" content="La radio de San Pedro del Sur. En directo las 24 horas.">
 <meta name="twitter:image" content="https://portal-san-pedro-sur.vercel.app/icons/og-image.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg-0:#0b0f14;
-    --bg-1:#161c22;
-    --orange:#ff7a1a;
-    --orange-deep:#e8620f;
-    --steel:#2f8fd1;
-    --ink:#f5f4f0;
-    --ink-dim:#a4acb3;
-    --line:#242c34;
-    --mini-h:74px;
-    --safe-b: env(safe-area-inset-bottom, 0px);
-    --safe-t: env(safe-area-inset-top, 0px);
-  }
+/* ============================================================
+   PLANTILLA DE radiopartyoficial — con paleta negra y naranja
+   Estructura: barra superior · cabecera · franja del reproductor ·
+   banner deslizante · bloque en vivo · noticias · pie.
+   Colores propios: negro + naranja.
+   ============================================================ */
+:root{
+  --primary:#f97316;
+  --primary-dark:#c2410c;
+  --primary-light:#ffedd5;
+  --amber:#fbbf24;
 
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  --bg:#ffffff;
+  --surface:#fafafa;
+  --surface-2:#f4f4f6;
+  --text:#18181b;
+  --text-muted:#6b6b73;
+  --line:#e6e6ea;
 
-  html,body{
-    height:100%;
-    overflow:hidden;
-    overscroll-behavior:none;
-    position:fixed;
-    inset:0;
-    width:100%;
-  }
+  --strip-bg:linear-gradient(90deg,#f97316,#fbbf24);
+  --header-bg:linear-gradient(135deg,#ffffff 0%,#fff8f0 100%);
 
-  body{
-    background:var(--bg-0);
-    color:var(--ink);
-    font-family:'Archivo',sans-serif;
-    touch-action:pan-x;
-  }
+  --font-display:'Unbounded',sans-serif;
+  --font-body:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --radius:14px;
+  --radius-sm:10px;
 
-  button{font-family:inherit;}
-  img{-webkit-user-drag:none;user-select:none;}
+  --sh-card:0 8px 24px rgba(24,24,27,.08);
+  --sh-brand:0 8px 20px rgba(249,115,22,.30);
 
-  /* ============================================================
-     PANTALLA DE BIENVENIDA — solo en navegador (no instalada).
-     El navegador bloquea el audio automático, por eso se pide
-     un toque antes de reproducir el intro.
-  ============================================================ */
-  #welcome-gate{
-    position:fixed;inset:0;z-index:1000;
-    background:
-      radial-gradient(120% 80% at 50% 20%, rgba(255,122,26,.25), transparent 60%),
-      var(--bg-0);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:26px;padding:24px;text-align:center;
-    transition:opacity .4s ease, visibility .4s ease;
-  }
-  #welcome-gate.hide{opacity:0;visibility:hidden;pointer-events:none;}
-  .welcome-logo{
-    width:150px;height:150px;border-radius:50%;overflow:hidden;
-    box-shadow:0 0 0 2px var(--orange), 0 0 60px -10px rgba(255,122,26,.75);
-  }
-  .welcome-logo img{width:100%;height:100%;object-fit:cover;}
-  .welcome-title{font-family:'Archivo Black',sans-serif;font-size:24px;letter-spacing:.02em;}
-  .welcome-sub{font-size:13px;color:var(--ink-dim);letter-spacing:.1em;text-transform:uppercase;max-width:280px;}
-  #enter-btn{
-    margin-top:6px;
-    padding:16px 44px;border-radius:999px;border:none;cursor:pointer;
-    background:linear-gradient(135deg, var(--orange), var(--orange-deep));
-    color:#fff;font-family:'Archivo Black',sans-serif;font-size:15px;letter-spacing:.06em;
-    box-shadow:0 14px 30px -10px rgba(255,122,26,.7);
-    transition:transform .15s ease;
-  }
-  #enter-btn:active{transform:scale(.95);}
+  /* Superficies que cambian con el tema */
+  --card:#ffffff;         /* tarjetas */
+  --card-b:#fafafa;       /* tarjetas al hover / notas */
+  --ph:linear-gradient(135deg,#fff7ed,#ffedd5);   /* fondo de imagen ausente */
+  --band:linear-gradient(160deg,#fff7ed,#ffedd5); /* franja de la foto de noticia */
+  --brand-bg:linear-gradient(135deg,#fff7ed,#ffffff 55%,#fffbeb);
+  --brand-dot:linear-gradient(90deg,rgba(249,115,22,.22),rgba(251,191,36,.22));
+  --nav-bg:rgba(255,255,255,.90);
+  --top-bg:#ffffff;
+  --slider:#e6e6ea;
+  --dot:rgba(24,24,27,.22);
+  --chip:#ffffff;
+  --chip-ink:#18181b;
+  --disc:conic-gradient(from 220deg,#ffffff,#f7f7f9 25%,#ffffff 50%,#fbfbfc 75%,#ffffff);
+  --line-strong:#e6e6ea;
 
-  /* ============================================================
-     SPLASH / INTRO — logo con animación mientras suena el MP3
-  ============================================================ */
-  #splash-screen{
-    position:fixed;inset:0;z-index:999;
-    background:
-      radial-gradient(120% 80% at 50% 20%, rgba(255,122,26,.30), transparent 60%),
-      var(--bg-0);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:22px;
-    opacity:0;visibility:hidden;pointer-events:none;
-    transition:opacity .55s ease, visibility .55s ease;
-  }
-  #splash-screen.show{opacity:1;visibility:visible;pointer-events:auto;}
-  .splash-logo-wrap{
-    width:156px;height:156px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:0 0 0 2px var(--orange), 0 0 60px -10px rgba(255,122,26,.75);
-    overflow:hidden;
-    animation:splash-pop .7s cubic-bezier(.34,1.56,.64,1) both, splash-pulse 1.8s ease-in-out .7s infinite;
-  }
-  .splash-logo-wrap img{width:100%;height:100%;object-fit:cover;}
-  @keyframes splash-pop{
-    0%{transform:scale(.4);opacity:0;}
-    100%{transform:scale(1);opacity:1;}
-  }
-  @keyframes splash-pulse{
-    0%,100%{box-shadow:0 0 0 2px var(--orange), 0 0 40px -10px rgba(255,122,26,.6);}
-    50%{box-shadow:0 0 0 2px var(--orange), 0 0 70px -5px rgba(47,143,209,.85);}
-  }
-  .splash-brand{
-    font-family:'Archivo Black',sans-serif;
-    font-size:22px;letter-spacing:.04em;
-    opacity:0;animation:splash-fade-in .6s ease .35s forwards;
-    text-align:center;
-  }
-  .splash-tagline{
-    font-size:12px;color:var(--ink-dim);letter-spacing:.15em;text-transform:uppercase;
-    opacity:0;animation:splash-fade-in .6s ease .55s forwards;
-  }
-  @keyframes splash-fade-in{
-    from{opacity:0;transform:translateY(6px);}
-    to{opacity:1;transform:translateY(0);}
-  }
-  .splash-bar{
-    width:120px;height:3px;border-radius:3px;background:var(--line);overflow:hidden;
-    opacity:0;animation:splash-fade-in .5s ease .75s forwards;
-  }
-  .splash-bar span{
-    display:block;height:100%;width:40%;background:var(--orange);
-    animation:splash-loading 1.1s ease-in-out infinite;
-  }
-  @keyframes splash-loading{
-    0%{transform:translateX(-100%);}
-    100%{transform:translateX(350%);}
-  }
-  /* Aviso discreto de "toca para continuar" si el navegador bloquea el audio
-     incluso estando instalada como app */
-  .splash-tap-fallback{
-    margin-top:4px;font-size:12px;color:var(--steel);letter-spacing:.06em;
-    opacity:0;visibility:hidden;transition:opacity .3s ease;
-  }
-  .splash-tap-fallback.show{opacity:1;visibility:visible;}
+  --mini-h:74px;
+  --ease:cubic-bezier(.32,.72,.24,1);
+  --t:.25s; --t-fast:.16s;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
 
-  /* ============================================================
-     VISTA 1 — INICIO (portada a pantalla completa)
-  ============================================================ */
-  #home-view{
-    position:fixed;
-    inset:0;
-    height:100dvh;
-    display:flex;
-    flex-direction:column;
-    background:
-      radial-gradient(130% 90% at 15% 100%, rgba(47,143,209,.18), transparent 55%),
-      radial-gradient(120% 70% at 85% 0%, rgba(255,122,26,.25), transparent 60%),
-      var(--bg-0);
-    padding-bottom: calc(var(--mini-h) + var(--safe-b));
-    padding-top: var(--safe-t);
-    overflow:hidden;
-  }
-  .grain{
-    position:absolute;inset:0;z-index:2;pointer-events:none;
-    background-image:repeating-linear-gradient(115deg, rgba(255,255,255,.02) 0 2px, transparent 2px 46px);
-  }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+/* IMPORTANTE: overflow-x va con "clip", NO con "hidden".
+   "hidden" convierte el elemento en contenedor de scroll y en Android deja de
+   funcionar el scroll vertical. "clip" recorta sin crear scroll.
+   touch-action:pan-y + overscroll-behavior-x:ninguno son los que CONGELAN el
+   eje: sin ellos el celular permite arrastrar la pantalla hacia los costados
+   aunque la pagina no desborde. */
+html{
+  scroll-behavior:smooth;
+  overflow-x:clip;
+  -webkit-text-size-adjust:100%;
+  touch-action:pan-y;
+  overscroll-behavior-x:none;
+}
+body{
+  font-family:var(--font-body);background:var(--bg);color:var(--text);
+  line-height:1.5;width:100%;
+  padding-bottom:calc(var(--mini-h) + var(--safe-b));
+  -webkit-font-smoothing:antialiased;
+  overflow-x:clip;
+  touch-action:pan-y;
+  overscroll-behavior-x:none;
+}
+img{-webkit-user-drag:none;user-select:none;}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;}
+.container{max-width:1280px;margin:0 auto;padding:0 22px;position:relative;z-index:2;}
 
-  /* Video de fondo — a pantalla completa, cubre todo el home-view,
-     centrado, detrás de todo el contenido */
-  .model-photo{
-    position:absolute;
-    z-index:0;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:center;
-    pointer-events:none;
-  }
-  .video-scrim{
-    position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:
-      linear-gradient(to top, rgba(11,15,20,.85) 0%, rgba(11,15,20,.25) 42%, rgba(11,15,20,.55) 100%);
-  }
+/* ---------- BARRA SUPERIOR ---------- */
+.topbar{background:var(--top-bg);border-bottom:1px solid var(--line);padding-top:var(--safe-t);}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:38px;}
+.tb-ticker{
+  display:flex;align-items:center;gap:10px;min-width:0;flex:1;
+  font-size:12.5px;color:var(--text-muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tb-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--primary);flex-shrink:0;
+  box-shadow:0 0 0 0 rgba(249,115,22,.65);animation:tbPulse 1.8s infinite;
+}
+@keyframes tbPulse{
+  0%{box-shadow:0 0 0 0 rgba(249,115,22,.6);}
+  70%{box-shadow:0 0 0 7px rgba(249,115,22,0);}
+  100%{box-shadow:0 0 0 0 rgba(249,115,22,0);}
+}
+.topSocial{display:flex;gap:6px;flex-shrink:0;}
+.topSocial a{
+  width:27px;height:27px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface);color:var(--text-muted);border:1px solid var(--line);
+  transition:all var(--t) var(--ease);
+}
+.topSocial a:hover{background:var(--strip-bg);border-color:transparent;color:#000;}
+.topSocial svg{width:14px;height:14px;}
 
-  header{
-    position:relative;z-index:3;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:22px clamp(20px,5vw,64px);
-    gap:12px;
-    flex-shrink:0;
-  }
-  .brand{display:flex;align-items:center;gap:10px;min-width:0;}
-  .brand-mark{
-    width:44px;height:44px;border-radius:50%;background:var(--bg-1);
-    border:2px solid var(--orange);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Archivo Black',sans-serif;font-size:13px;flex-shrink:0;
-    overflow:hidden;
-  }
-  .brand-mark img{width:100%;height:100%;object-fit:cover;}
-  .brand-name{font-family:'Archivo Black',sans-serif;font-size:15px;letter-spacing:.02em;white-space:nowrap;}
+/* ---------- CABECERA ---------- */
+.siteHeader{position:sticky;top:0;z-index:40;background:var(--nav-bg);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);}
+.header-inner{display:flex;align-items:center;gap:18px;min-height:68px;}
+.logo{display:flex;align-items:center;gap:11px;flex-shrink:0;}
+.logo-mark{
+  width:42px;height:42px;border-radius:var(--radius-sm);overflow:hidden;
+  border:2px solid var(--primary);background:var(--card);
+}
+.logo-mark img{width:100%;height:100%;object-fit:cover;}
+.logo-text{display:flex;flex-direction:column;line-height:1.2;}
+.logo-text strong{
+  font-family:var(--font-display);font-weight:800;font-size:14px;
+  letter-spacing:.05em;color:var(--text);white-space:nowrap;
+}
+.logo-text span{font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--primary);font-weight:700;}
+.mainNav{display:flex;align-items:center;gap:2px;margin-left:auto;}
+.mainNav a{
+  padding:9px 14px;border-radius:var(--radius-sm);
+  font-size:13.5px;font-weight:600;color:var(--text-muted);
+  transition:color var(--t) var(--ease), background var(--t) var(--ease);
+}
+.mainNav a:hover,.mainNav a.on{color:var(--primary);background:rgba(249,115,22,.10);}
+#install-btn{
+  display:none;align-items:center;gap:7px;
+  padding:11px 17px;border:none;border-radius:var(--radius-sm);cursor:pointer;
+  background:var(--strip-bg);color:#1a0a00;
+  font-family:var(--font-display);font-weight:800;font-size:10.5px;
+  letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;
+  transition:transform var(--t-fast) var(--ease);
+}
+#install-btn:active{transform:scale(.96);}
+#install-btn svg{width:14px;height:14px;}
+#install-btn.show{display:inline-flex;}
 
-  /* Botón instalar PWA */
-  #install-btn{
-    display:none;
-    align-items:center;gap:8px;
-    padding:10px 16px;border-radius:999px;
-    background:var(--orange);color:#fff;
-    font-weight:800;font-size:12.5px;letter-spacing:.02em;
-    border:none;cursor:pointer;flex-shrink:0;
-    box-shadow:0 10px 24px -10px rgba(255,122,26,.8);
-    transition:transform .15s ease;
-    white-space:nowrap;
-  }
-  #install-btn:active{transform:scale(.95);}
-  #install-btn svg{width:16px;height:16px;flex-shrink:0;}
-  #install-btn.show{display:inline-flex;}
+/* ---------- BANNER DESLIZANTE ---------- */
+.section{padding:38px 0;}
+.banner-wrap{margin-bottom:34px;}
+.banner-slider{
+  position:relative;border-radius:var(--radius);overflow:hidden;
+  box-shadow:0 14px 36px rgba(24,24,27,.10);background:var(--surface-2);
+  aspect-ratio:21/8;max-height:420px;
+}
+.banner-track{display:flex;height:100%;transition:transform .5s var(--ease);}
+.banner-slide{min-width:100%;height:100%;position:relative;
+  display:flex;align-items:flex-end;}
+/* Slide de noticia: foto a pantalla completa y texto PEGADO encima,
+   en letra chica. Sin bloques blancos. */
+.banner-slide.link{
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  text-decoration:none;color:inherit;
+}
+/* la foto ocupa TODO el slide, sin recortes raros */
+.banner-slide.link .bs-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;pointer-events:none;
+}
+/* fondo de respaldo oscuro: si la foto no carga, nunca queda en blanco */
+.banner-slide.link .bg.dark{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(60% 80% at 20% 100%, rgba(249,115,22,.30), transparent 62%),
+    linear-gradient(135deg,#1a1208,#0a0a0a 60%,#180f06);
+}
+/* velo suave SOLO en la franja baja, para que el texto chico se lea */
+.banner-slide.link::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:62%;
+  pointer-events:none;z-index:1;
+  background:linear-gradient(to top, rgba(8,8,10,.88) 0%, rgba(8,8,10,.55) 45%, rgba(8,8,10,0) 100%);
+}
+/* sello del medio */
+.banner-fuente{
+  position:absolute;top:10px;right:10px;z-index:3;
+  background:rgba(10,10,10,.66);color:#fff;border-radius:999px;
+  padding:4px 10px;font-size:9px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;
+}
+/* texto: pegado abajo a la izquierda, chico, sobre la foto */
+.banner-slide.link .banner-content{
+  position:relative;z-index:2;
+  background:none;border:none;
+  padding:14px 18px;max-width:min(620px,92%);flex-shrink:0;
+}
+.banner-slide.link .banner-tag{
+  margin-bottom:6px;font-size:8.5px;padding:3px 9px;
+}
+.banner-slide.link .banner-content h3{
+  color:#fff;font-size:clamp(14px,3.4vw,18px);line-height:1.15;
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+.banner-slide.link .banner-content p{
+  color:rgba(255,255,255,.88);font-size:11.5px;margin-top:5px;
+  text-shadow:0 1px 3px rgba(0,0,0,.7);
+}
+.banner-slide .bg{
+  position:absolute;inset:0;
+  background:var(--brand-bg);
+}
+.banner-slide .bg.pattern{
+  background:var(--brand-dot), var(--brand-bg);}
+.banner-content{position:relative;z-index:2;padding:26px 28px;max-width:620px;}
+.banner-tag{
+  display:inline-block;margin-bottom:11px;
+  background:var(--strip-bg);color:#1a0a00;
+  font-family:var(--font-display);font-weight:800;font-size:9.5px;
+  letter-spacing:.13em;text-transform:uppercase;padding:5px 12px;border-radius:999px;
+}
+.banner-content h3{
+  font-family:var(--font-display);font-weight:900;font-size:clamp(20px,3.4vw,34px);
+  line-height:1.05;letter-spacing:-.02em;color:var(--text);
+}
+.banner-content p{margin-top:9px;font-size:14px;color:var(--text-muted);}
+.bannerPrev,.bannerNext{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+  width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,255,255,.78);color:#18181b;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:background var(--t) var(--ease);
+}
+.bannerPrev:hover,.bannerNext:hover{background:var(--primary);color:#fff;border-color:transparent;}
+.bannerPrev{left:14px;} .bannerNext{right:14px;}
+.bannerPrev svg,.bannerNext svg{width:20px;height:20px;}
+.bannerDots{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;
+  display:flex;gap:6px;
+}
+.bannerDots button{
+  width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--dot);transition:all var(--t) var(--ease);}
+.bannerDots button.on{background:var(--primary);width:22px;border-radius:999px;}
 
-  .hero{
-    position:relative;z-index:3;
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-end;
-    gap:14px;
-    padding:24px clamp(20px,6vw,64px) 26px;
-    min-height:0;
-    max-width:600px;
-  }
+/* ---------- CABECERA DE SECCION ---------- */
+.section-strip{
+  display:flex;align-items:stretch;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--sh-card);overflow:hidden;margin-bottom:22px;
+}
+.ss-icon{
+  display:grid;place-items:center;width:56px;flex-shrink:0;
+  background:var(--strip-bg);color:#1a0a00;
+}
+.ss-icon svg{width:22px;height:22px;}
+.ss-title{
+  flex:1;display:flex;align-items:center;padding:0 22px;
+  font-family:var(--font-display);font-weight:800;font-size:15px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--primary);
+}
+.ss-link{
+  display:flex;align-items:center;padding:0 22px;font-size:12px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);
+  border-left:1px solid var(--line);
+  transition:color var(--t) var(--ease), background var(--t) var(--ease);
+}
+.ss-link:hover{color:var(--primary);background:rgba(249,115,22,.08);}
 
-  .live-pill{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:8px 18px 8px 14px;border-radius:999px;
-    background:var(--orange);
-    font-size:13px;letter-spacing:.03em;color:#fff;font-weight:800;
-    width:fit-content;
-  }
-  .live-dot{
-    width:8px;height:8px;border-radius:50%;background:#fff;
-    animation:pulse 1.6s infinite;
-  }
-  @keyframes pulse{
-    0%{box-shadow:0 0 0 0 rgba(255,255,255,.55);}
-    70%{box-shadow:0 0 0 9px rgba(255,255,255,0);}
-    100%{box-shadow:0 0 0 0 rgba(255,255,255,0);}
-  }
+/* ---------- NOTICIAS (con imagen) ---------- */
+.latest-strip{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+}
+.news-card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--sh-1);
+  overflow:hidden;display:flex;flex-direction:column;
+  transition:transform var(--t) var(--ease), box-shadow var(--t) var(--ease),
+             border-color var(--t) var(--ease);
+}
+.news-card:hover{transform:translateY(-5px);border-color:var(--primary);
+  box-shadow:0 16px 34px rgba(234,88,12,.20);}
 
-  .hero h1{
-    font-family:'Archivo Black',sans-serif;
-    font-size:clamp(30px,8vw,46px);
-    letter-spacing:.005em;
-    line-height:1.02;
-    max-width:14ch;
-    text-shadow:0 2px 4px rgba(0,0,0,.5), 0 4px 24px rgba(0,0,0,.55), 0 0 2px rgba(0,0,0,.6);
-  }
-  .hero h1 .accent{
-    color:var(--orange);
-    -webkit-text-stroke:1.5px rgba(255,255,255,.4);
-    text-shadow:0 2px 4px rgba(0,0,0,.55), 0 4px 26px rgba(0,0,0,.6);
-  }
-  .hero p.tagline{
-    color:var(--ink-dim);font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
-    text-shadow:0 1px 3px rgba(0,0,0,.7), 0 2px 10px rgba(0,0,0,.5);
-  }
+.nc-img{
+  position:relative;aspect-ratio:16/9;overflow:hidden;flex-shrink:0;
+  background:var(--ph);
+}
+/* la foto queda fija dentro de la caja: nunca puede pisar el titular */
+.nc-img img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;display:block;transition:transform .5s var(--ease);
+}
+.news-card:hover .nc-img img{transform:scale(1.05);}
+.nc-img .fallback{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:800;font-size:12px;
+  letter-spacing:.08em;color:rgba(234,88,12,.45);text-transform:uppercase;
+}
+.nc-src{
+  position:absolute;left:10px;bottom:10px;
+  background:rgba(10,10,10,.72);color:#fff;border-radius:999px;
+  padding:5px 11px;font-size:10px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.nc-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1;}
+.nc-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.nc-tag{
+  font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;
+  padding:4px 10px;border-radius:999px;
+}
+.nc-time{font-size:11px;color:var(--text-muted);}
+.nc-title{
+  font-size:15px;font-weight:700;color:var(--text);line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.nc-text{font-size:12.5px;color:var(--text-muted);line-height:1.55;}
+.nc-link{
+  margin-top:auto;padding-top:12px;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--primary-dark);display:inline-flex;align-items:center;gap:6px;
+  transition:gap var(--t) var(--ease), color var(--t) var(--ease);
+}
+.ver-mas-wrap{display:flex;justify-content:center;padding:26px 0 0;}
+.ver-mas{
+  display:inline-flex;align-items:center;gap:9px;padding:13px 26px;
+  border-radius:var(--radius-sm);background:var(--strip-bg);color:#1a0a00;
+  font-family:var(--font-display);font-weight:800;font-size:12px;
+  letter-spacing:.09em;text-transform:uppercase;
+  box-shadow:0 8px 20px rgba(249,115,22,.28);
+  transition:transform var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+.ver-mas:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(249,115,22,.38);}
+.ver-mas svg{width:16px;height:16px;}
+.nc-link:hover{gap:11px;color:var(--primary);}
+.nc-link svg{width:13px;height:13px;}
 
-  .social-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
-  .social-row a{
-    width:42px;height:42px;border-radius:50%;
-    background:rgba(245,244,240,.06);
-    border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;
-    color:var(--ink);text-decoration:none;
-    transition:border-color .2s,color .2s,transform .15s,background .2s;
-  }
-  .social-row a:hover{border-color:var(--orange);color:var(--orange);transform:translateY(-2px);}
-  .social-row svg{width:18px;height:18px;}
+/* ---------- EL TIEMPO ---------- */
+.weather-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.weather-note{
+  grid-column:1/-1;font-size:13px;color:var(--text-muted);
+  padding:20px;text-align:center;background:var(--card);
+  border:1px solid var(--line);border-radius:var(--radius);
+}
+.wcard{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--sh-1);padding:14px 10px 16px;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  transition:transform var(--t) var(--ease), box-shadow var(--t) var(--ease),
+             border-color var(--t) var(--ease);
+}
+.wcard:hover{transform:translateY(-3px);border-color:var(--primary);box-shadow:var(--sh-3);}
+.wcard.hoy{border-color:var(--primary);background:var(--band);}
+.wday{
+  font-family:var(--font-display);font-weight:800;font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--orange-dark);
+}
+.wicon{width:42px;height:42px;color:var(--primary);}
+.wdesc{font-size:10.5px;color:var(--text-muted);text-align:center;line-height:1.3;min-height:26px;}
+.wtemp{display:flex;align-items:baseline;gap:4px;}
+.wtemp .max{font-family:var(--font-display);font-weight:800;font-size:20px;color:var(--text);}
+.wtemp .min{font-size:13px;color:var(--text-dim);}
+.wrain{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:#0284c7;}
+.wrain svg{width:12px;height:12px;}
+.weather-credit{margin-top:12px;font-size:11.5px;color:var(--text-dim);text-align:center;}
 
-  /* ---- Mini reproductor (barra fija inferior, funcional) ---- */
-  #mini-bar{
-    position:fixed;
-    left:0;right:0;
-    bottom:0;
-    height:calc(var(--mini-h) + var(--safe-b));
-    padding-bottom:var(--safe-b);
-    background:#10141a;
-    border-top:1px solid var(--line);
-    display:flex;
-    align-items:center;
-    gap:14px;
-    padding-left:16px;padding-right:16px;
-    cursor:pointer;
-    z-index:20;
-    box-shadow:0 -8px 30px -10px rgba(0,0,0,.5);
-  }
-  #mini-bar .mini-mark{
-    width:44px;height:44px;border-radius:50%;flex-shrink:0;
-    background:var(--bg-0);border:2px solid var(--orange);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Archivo Black',sans-serif;font-size:10px;
-    overflow:hidden;
-  }
-  #mini-bar .mini-mark img{width:100%;height:100%;object-fit:cover;}
-  #mini-bar .mini-mark.spinning{animation:spin 9s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg);}}
+/* ---------- FACEBOOK ---------- */
+.fb-holder{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--sh-1);padding:20px;display:flex;flex-direction:column;
+  align-items:center;gap:14px;
+}
+.fb-page{width:100%;max-width:380px;min-height:180px;}
+#fb-link-directo{
+  background:var(--strip-bg);color:#1a0a00;padding:6px 12px;border-radius:var(--r-sm);
+}
+#fb-link-directo:hover{background:var(--grad);color:#fff;}
 
-  .mini-info{flex:1;min-width:0;overflow:hidden;}
-  .mini-marquee{white-space:nowrap;}
-  .mini-info .t1{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .mini-info .t2{font-size:12px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* ---------- BOTON DE TEMA ---------- */
+.tema-btn{
+  width:38px;height:38px;border-radius:var(--radius-sm);
+  border:1px solid var(--line);background:var(--card);color:var(--ink-2);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+  transition:background var(--t) var(--ease), color var(--t) var(--ease),
+             border-color var(--t) var(--ease), transform var(--t-fast) var(--ease);
+}
+.tema-btn:hover{border-color:var(--primary);color:var(--primary);}
+.tema-btn:active{transform:scale(.94);}
+.tema-btn svg{width:18px;height:18px;}
+/* En oscuro se muestra el sol (para pasar a claro) y en claro la luna */
+.ic-luna{display:none;}
+[data-tema="oscuro"] .ic-luna{display:block;}
+[data-tema="oscuro"] .ic-sol{display:none;}
+@media(max-width:640px){ .tema-btn{width:34px;height:34px;} }
 
-  /* Ecualizador animado */
-  .eq{display:flex;align-items:flex-end;gap:3px;height:22px;flex-shrink:0;}
-  .eq span{
-    width:3px;border-radius:2px;background:var(--steel);
-    animation:eqbar 1s ease-in-out infinite;
-    height:6px;
-  }
-  .eq.paused span{animation-play-state:paused;height:4px;background:var(--ink-dim);}
-  .eq span:nth-child(1){animation-duration:.8s;animation-delay:0s;}
-  .eq span:nth-child(2){animation-duration:1.1s;animation-delay:.1s;}
-  .eq span:nth-child(3){animation-duration:.7s;animation-delay:.15s;}
-  .eq span:nth-child(4){animation-duration:1s;animation-delay:.05s;}
-  .eq span:nth-child(5){animation-duration:.9s;animation-delay:.2s;}
-  @keyframes eqbar{
-    0%,100%{height:5px;}
-    50%{height:22px;}
-  }
+/* ---------- PIE ---------- */
+footer{background:var(--surface);border-top:1px solid var(--line);padding:50px 0 32px;}
+.foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:36px;}
+.foot-brand{display:flex;align-items:center;gap:11px;margin-bottom:14px;}
+.foot-brand img{width:42px;height:42px;border-radius:var(--radius-sm);
+  border:2px solid var(--primary);background:var(--card);}
+.foot-brand span{font-family:var(--font-display);font-weight:800;font-size:14px;
+  letter-spacing:.05em;color:var(--text);}
+.foot-about{font-size:13.5px;color:var(--text-muted);max-width:40ch;line-height:1.7;}
+.foot-social{display:flex;gap:9px;margin-top:18px;}
+.foot-social a{
+  width:38px;height:38px;border-radius:var(--radius-sm);
+  background:var(--card);color:var(--text-muted);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;transition:all var(--t) var(--ease);
+}
+.foot-social a:hover{background:var(--strip-bg);border-color:transparent;color:#000;}
+.foot-social svg{width:17px;height:17px;}
+.foot-title{font-family:var(--font-display);font-weight:800;font-size:11px;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--primary);margin-bottom:14px;}
+.foot-links{display:flex;flex-direction:column;gap:9px;}
+.foot-links a{font-size:13.5px;color:var(--text-muted);transition:color var(--t) var(--ease);}
+.foot-links a:hover{color:var(--primary);}
+.foot-bottom{
+  margin-top:34px;padding-top:22px;border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  font-size:12.5px;color:#8b8b93;
+}
 
-  #mini-play{
-    width:40px;height:40px;border-radius:50%;flex-shrink:0;
-    background:var(--orange);border:none;color:#fff;
-    display:flex;align-items:center;justify-content:center;cursor:pointer;
-  }
-  #mini-play svg{width:16px;height:16px;}
+/* ---------- BARRA MINI ---------- */
+/* fondo NEGRO con letras BLANCAS */
+#mini-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  height:calc(var(--mini-h) + var(--safe-b));padding-bottom:var(--safe-b);
+  background:#0a0a0a;
+  border-top:1px solid rgba(255,255,255,.10);
+  box-shadow:0 -8px 26px rgba(0,0,0,.55);
+  display:flex;align-items:center;gap:14px;padding-left:16px;padding-right:16px;cursor:pointer;
+}
+#mini-bar .mini-mark{
+  width:44px;height:44px;border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0;
+  background:#111;border:1px solid rgba(249,115,22,.55);
+}
+#mini-bar .mini-mark img{width:100%;height:100%;object-fit:cover;}
+#mini-bar .mini-mark.spinning{animation:spin 9s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.mini-info{flex:1;min-width:0;overflow:hidden;}
+.mini-info .t1{font-size:13.5px;font-weight:700;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mini-info .t2{font-size:11.5px;color:rgba(255,255,255,.62);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.eq{display:flex;align-items:flex-end;gap:3px;height:22px;flex-shrink:0;}
+.eq span{width:3px;height:6px;border-radius:2px;background:var(--primary);
+  animation:eqbar 1s ease-in-out infinite;}
+.eq.paused span{animation-play-state:paused;height:4px;background:rgba(255,255,255,.28);}
+.eq span:nth-child(1){animation-duration:.8s;}
+.eq span:nth-child(2){animation-duration:1.1s;animation-delay:.1s;}
+.eq span:nth-child(3){animation-duration:.7s;animation-delay:.15s;}
+.eq span:nth-child(4){animation-duration:1s;animation-delay:.05s;}
+.eq span:nth-child(5){animation-duration:.9s;animation-delay:.2s;}
+@keyframes eqbar{0%,100%{height:5px;}50%{height:22px;}}
+#mini-play{
+  width:42px;height:42px;border-radius:var(--radius-sm);border:none;flex-shrink:0;
+  background:var(--strip-bg);color:#1a0a00;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform var(--t-fast) var(--ease);
+}
+#mini-play:active{transform:scale(.92);}
+#mini-play svg{width:17px;height:17px;}
+#mini-vol-btn{
+  width:36px;height:36px;border-radius:var(--radius-sm);border:none;flex-shrink:0;
+  background:none;color:rgba(255,255,255,.72);cursor:pointer;
+  display:none;align-items:center;justify-content:center;transition:color var(--t) var(--ease);
+}
+#mini-vol-btn:hover{color:var(--primary);}
+#mini-vol-btn svg{width:18px;height:18px;}
+@media(min-width:480px){#mini-vol-btn{display:flex;}}
 
-  #mini-vol-btn{
-    width:36px;height:36px;border-radius:50%;flex-shrink:0;
-    background:none;border:none;color:var(--ink-dim);cursor:pointer;
-    display:none;align-items:center;justify-content:center;
-  }
-  #mini-vol-btn svg{width:18px;height:18px;}
-  @media(min-width:480px){ #mini-vol-btn{display:flex;} }
+/* ---------- REPRODUCTOR ---------- */
+#player-view{
+  position:fixed;inset:0;z-index:70;background:var(--bg);
+  display:flex;flex-direction:column;transform:translateY(100%);
+  transition:transform .42s var(--ease);
+  overflow-y:auto;overscroll-behavior:contain;padding-top:var(--safe-t);
+  /* cerrado: invisible y sin capturar toques, para no trabar el scroll */
+  visibility:hidden;pointer-events:none;
+}
+#player-view.open{transform:translateY(0);visibility:visible;pointer-events:auto;}
+.player-top{display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--line);padding:14px 16px;}
+#back-btn{
+  background:none;border:none;cursor:pointer;color:var(--text);
+  width:40px;height:40px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;
+  transition:background var(--t) var(--ease), color var(--t) var(--ease);
+}
+#back-btn:hover{background:var(--surface);color:var(--primary);}
+#back-btn svg{width:22px;height:22px;}
+.player-top .pt-title{
+  font-family:var(--font-display);font-weight:800;font-size:11.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);
+}
+.player-body{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:22px;padding:24px 24px 60px;
+}
+.disc-wrap{position:relative;width:min(62vw,272px);aspect-ratio:1/1;}
+.disc{
+  width:100%;height:100%;border-radius:50%;
+  background:var(--disc);
+  border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 24px 48px -18px rgba(0,0,0,.6), 0 0 0 7px var(--band);
+}
+.disc.spinning{animation:spin 9s linear infinite;}
+.disc-core{width:44%;height:44%;border-radius:50%;overflow:hidden;
+  background:var(--card);border:2px solid var(--primary);}
+.disc-core img{width:100%;height:100%;object-fit:cover;}
+.station-info h1{font-family:var(--font-display);font-weight:800;
+  font-size:clamp(19px,5.2vw,27px);color:var(--text);letter-spacing:-.02em;}
+.station-info p{margin-top:7px;color:var(--text-muted);font-size:14px;}
+#track-title{margin-top:9px;font-size:12px;color:var(--primary);
+  font-weight:700;letter-spacing:.06em;min-height:16px;}
+.on-air-banner{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--strip-bg);color:#1a0a00;
+  font-family:var(--font-display);font-weight:800;font-size:11px;
+  letter-spacing:.15em;text-transform:uppercase;
+  padding:8px 22px;border-radius:999px;box-shadow:var(--sh-brand);
+}
+.controls{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:4px;}
+.btn-round{
+  background:none;border:none;cursor:pointer;color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;padding:8px;
+  transition:transform var(--t-fast) var(--ease), color var(--t) var(--ease),
+             background var(--t) var(--ease);
+}
+.btn-round:hover{color:var(--primary);background:var(--card);}
+.btn-round:active{transform:scale(.9);}
+.btn-round.btn-small{padding:10px;}
+#play-btn{
+  width:82px;height:82px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--strip-bg);color:#1a0a00;
+  transition:transform var(--t) var(--ease);
+}
+#play-btn:hover{transform:scale(1.05);}
+#play-btn svg{width:30px;height:30px;}
+.btn-small svg{width:22px;height:22px;}
+.volume-row{display:flex;align-items:center;gap:11px;width:100%;max-width:260px;margin-top:6px;}
+.volume-row svg{width:18px;color:var(--text-muted);flex-shrink:0;}
+input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:5px;
+  background:var(--slider);outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--primary);border:2px solid var(--bg);
+  box-shadow:0 2px 8px rgba(249,115,22,.45);cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;background:var(--primary);
+  border:2px solid var(--bg);cursor:pointer;
+}
+#status-msg{font-size:12px;color:var(--text-muted);min-height:16px;}
 
-  /* ============================================================
-     VISTA 2 — REPRODUCTOR A PANTALLA COMPLETA
-  ============================================================ */
-  #player-view{
-    position:fixed;
-    inset:0;
-    background:var(--bg-0);
-    z-index:50;
-    display:flex;
-    flex-direction:column;
-    transform:translateY(100%);
-    transition:transform .38s cubic-bezier(.4,0,.2,1);
-    overflow-y:auto;
-    overscroll-behavior:contain;
-    padding-top:var(--safe-t);
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:900px){
+  .latest-strip{grid-template-columns:1fr;}
+  .foot-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:860px){
+  .mainNav{display:none;}
   }
-  #player-view.open{transform:translateY(0);}
+@media(max-width:900px){
+  .latest-strip{grid-template-columns:1fr;}
+  .foot-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:640px){
+  .container{padding:0 16px;}
+  .section{padding:26px 0;}
+  /* barra superior: que el texto no llegue debajo de los iconos */
+  .tb-ticker{padding-right:10px;font-size:11.5px;}
+  .topSocial a{width:25px;height:25px;}
+  /* flechas del carrusel: sobre la foto, nunca sobre el titular */
+  .bannerPrev,.bannerNext{
+    top:34%;bottom:auto;transform:translateY(-50%);
+    width:32px;height:32px;background:var(--chip);
+  }
+  .bannerPrev{left:10px;} .bannerNext{right:10px;}
+  .bannerPrev svg,.bannerNext svg{width:16px;height:16px;}
+  .bannerDots{bottom:8px;}
+  .banner-slider{aspect-ratio:16/9;max-height:300px;}
+  /* texto chico pegado sobre la foto, abajo a la izquierda */
+  .banner-content{padding:12px 14px 34px;max-width:100%;}
+  .banner-content h3{font-size:clamp(15px,4.4vw,19px);line-height:1.12;}
+  .banner-content p{font-size:11.5px;margin-top:5px;}
+  .banner-tag{margin-bottom:6px;font-size:8.5px;padding:3px 9px;}
+  .banner-fuente{top:8px;right:8px;font-size:8.5px;padding:3px 8px;}
+  /* slides de noticia en movil: letra mas chica todavia */
+  .banner-slide.link .banner-content{padding:10px 13px 28px;max-width:min(620px,96%);}
+  .banner-slide.link .banner-content h3{font-size:13.5px;line-height:1.18;}
+  .banner-slide.link .banner-content p{font-size:11px;margin-top:4px;}
+  .banner-slide.link .banner-tag{font-size:8px;padding:3px 8px;margin-bottom:5px;}
+  .banner-slide.link::after{height:58%;}
+  /* NOTICIAS: dos por fila y sin estirar */
+  .latest-strip{
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    align-items:start;
+  }
+  .news-card{gap:5px;}
+  .nc-img{aspect-ratio:16/9;}
+  .nc-img .nc-src{font-size:8px;padding:3px 7px;left:6px;bottom:6px;}
+  .nc-body{padding:10px 11px 12px;gap:5px;}
+  .nc-top{gap:5px;}
+  .nc-tag{font-size:8px;padding:3px 7px;}
+  .nc-time{font-size:9.5px;}
+  .nc-title{font-size:12px;line-height:1.28;}
+  .nc-text{font-size:10.5px;line-height:1.45;}
+  .nc-link{font-size:9.5px;padding-top:8px;letter-spacing:.04em;}
+  .nc-link svg{width:11px;height:11px;}
+  .ss-icon{width:48px;}
+  .ss-title{font-size:12.5px;padding:0 14px;}
+  .ss-link{display:none;}
+  .foot-grid{grid-template-columns:1fr;gap:26px;}  /* EL TIEMPO en movil: dos por fila */
+  .weather-strip{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .wcard{padding:12px 8px 14px;}
+  .wicon{width:36px;height:36px;}
+  .wdesc{font-size:10px;min-height:24px;}
+  .wtemp .max{font-size:18px;}
+  .weather-credit{font-size:10.5px;}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+a:focus-visible,button:focus-visible,input:focus-visible{
+  outline:2px solid var(--primary);outline-offset:3px;border-radius:var(--radius-sm);
+}
 
-  .player-top{
-    display:flex;align-items:center;
-    padding:18px clamp(18px,5vw,40px);
-  }
-  #back-btn{
-    background:none;border:none;color:var(--ink);cursor:pointer;
-    width:38px;height:38px;display:flex;align-items:center;justify-content:center;
-    border-radius:50%;transition:background .15s;
-  }
-  #back-btn:hover{background:rgba(255,255,255,.06);}
-  #back-btn svg{width:22px;height:22px;}
+/* ============================================================
+   TEMA OSCURO â€” es el que se ve por defecto.
+   Para el claro, :root ya tiene los valores de arriba.
+   El boton de la cabecera alterna entre los dos.
+   ============================================================ */
+[data-tema="oscuro"]{
+  --bg:#0a0a0c;
+  --surface:#141417;
+  --surface-2:#1c1c21;
+  --text:#f5f4f2;
+  --ink:#f5f4f2;
+  --ink-2:#b3aea9;
+  --ink-dim:#8a8580;
+  --line:#2a2a30;
+  --primary-dark:#fdba74;
+  --primary-light:#2a1a10;
 
-  .player-body{
-    flex:1;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    text-align:center;gap:22px;
-    padding:10px 24px 50px;
-  }
+  --card:#141418;
+  --card-b:#1a1a1f;
+  --ph:linear-gradient(135deg,#241610,#1a120d);
+  --band:linear-gradient(160deg,#22150e,#17100b);
+  --brand-bg:linear-gradient(135deg,#1c1208,#0a0a0c 55%,#180f06);
+  --brand-dot:linear-gradient(90deg,rgba(249,115,22,.26),rgba(251,191,36,.18));
+  --nav-bg:rgba(10,10,12,.88);
+  --top-bg:#0a0a0c;
+  --slider:#2e2e35;
+  --dot:rgba(255,255,255,.26);
+  --chip:#1a1a1f;
+  --chip-ink:#f5f4f2;
+  --disc:conic-gradient(from 220deg,#1c1c21,#0f0f12 25%,#1c1c21 50%,#141418 75%,#1c1c21);
+  --line-strong:#33333b;
 
-  .disc-wrap{position:relative;width:min(60vw,270px);aspect-ratio:1/1;}
-  .disc{
-    width:100%;height:100%;border-radius:50%;
-    background:conic-gradient(from 220deg, var(--bg-1), #171b21 30%, var(--bg-1) 55%, #151920 80%, var(--bg-1));
-    border:6px solid #1b2027;
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:0 30px 60px -20px rgba(255,122,26,.35), inset 0 0 0 1px rgba(255,255,255,.03);
-  }
-  .disc.spinning{animation:spin 9s linear infinite;}
-  .disc-core{
-    width:44%;height:44%;border-radius:50%;background:var(--bg-0);
-    border:3px solid var(--orange);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Archivo Black',sans-serif;font-size:clamp(15px,4vw,20px);
-    overflow:hidden;
-  }
-  .disc-core img{width:100%;height:100%;object-fit:cover;}
-
-  .station-info h1{font-family:'Archivo Black',sans-serif;font-size:clamp(22px,5.5vw,30px);}
-  .station-info p{margin-top:6px;color:var(--ink-dim);font-size:14px;}
-
-  #track-title{font-size:13px;color:var(--steel);font-weight:600;min-height:16px;letter-spacing:.02em;}
-
-  .on-air-banner{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:8px 22px;border-radius:999px;
-    background:var(--orange);color:#fff;
-    font-weight:800;font-size:13px;letter-spacing:.04em;
-  }
-
-  .controls{display:flex;align-items:center;justify-content:center;gap:26px;}
-  .btn-round{
-    background:none;border:none;color:var(--ink);cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-    transition:transform .15s ease,color .15s ease;
-  }
-  .btn-round:hover{color:var(--orange);}
-  .btn-round:active{transform:scale(.92);}
-  #play-btn{
-    width:76px;height:76px;border-radius:50%;background:var(--orange);color:#fff;
-    box-shadow:0 12px 30px -10px rgba(255,122,26,.7);
-  }
-  #play-btn:hover{color:#fff;transform:scale(1.04);}
-  #play-btn svg{width:28px;height:28px;}
-  .btn-small svg{width:22px;height:22px;}
-
-  .volume-row{display:flex;align-items:center;gap:10px;width:100%;max-width:220px;}
-  input[type=range]{
-    -webkit-appearance:none;width:100%;height:4px;border-radius:4px;
-    background:var(--line);outline:none;cursor:pointer;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
-    background:var(--steel);border:2px solid var(--bg-0);box-shadow:0 0 0 1px var(--steel);cursor:pointer;
-  }
-  input[type=range]::-moz-range-thumb{
-    width:14px;height:14px;border-radius:50%;background:var(--steel);
-    border:2px solid var(--bg-0);cursor:pointer;
-  }
-
-  #status-msg{font-size:12px;color:var(--ink-dim);min-height:14px;}
-
-  @media (max-width:420px){
-    header{padding:16px 16px;}
-    .hero{gap:12px;padding-bottom:20px;}
-    .controls{gap:18px;}
-    #install-btn span{display:none;}
-    #install-btn{padding:10px;width:38px;height:38px;justify-content:center;border-radius:50%;}
-  }
-
-  /* Pantallas muy bajas (móviles pequeños en horizontal, etc.) */
-  @media (max-height:640px){
-    .hero h1{font-size:clamp(24px,7vw,34px);}
-    .social-row a{width:38px;height:38px;}
-    header{padding-top:14px;padding-bottom:8px;}
-  }
+  --sh-1:0 1px 2px rgba(0,0,0,.5);
+  --sh-2:0 8px 24px rgba(0,0,0,.55);
+  --sh-3:0 16px 40px rgba(0,0,0,.65);
+}
 </style>
+    <!-- Facebook Page Plugin -->
+    <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v22.0"></script>
 </head>
 <body>
 
-<!-- ============ PANTALLA DE BIENVENIDA (solo navegador) ============ -->
-<div id="welcome-gate">
-  <div class="welcome-logo">
-    <img src="icons/icon-192.png" alt="Portal San Pedro Sur">
-  </div>
-  <div class="welcome-title">PORTAL SAN PEDRO SUR</div>
-  <div class="welcome-sub">Tocá entrar para escuchar en vivo</div>
-  <button id="enter-btn">ENTRAR</button>
-</div>
-
-<!-- ============ SPLASH / INTRO (logo + audio de bienvenida) ============ -->
-<div id="splash-screen">
-  <div class="splash-logo-wrap">
-    <img src="icons/icon-192.png" alt="Portal San Pedro Sur">
-  </div>
-  <div class="splash-brand">PORTAL SAN PEDRO SUR</div>
-  <div class="splash-tagline">Radio online · En vivo</div>
-  <div class="splash-bar"><span></span></div>
-  <div class="splash-tap-fallback" id="splash-tap-fallback">Tocá la pantalla para continuar</div>
-</div>
-
-<!-- ============ VISTA 1: INICIO ============ -->
-<div id="home-view">
-
-  <div class="grain"></div>
-  <video class="model-photo" src="assets/modelo-video.mp4" poster="assets/modelo-poster.jpg" autoplay muted loop playsinline></video>
-  <div class="video-scrim"></div>
-
-  <header>
-    <div class="brand">
-      <div class="brand-mark"><img src="icons/icon-192.png" alt="Portal San Pedro Sur"></div>
-      <div class="brand-name">PORTAL SP SUR</div>
+<!-- ============ BARRA SUPERIOR ============ -->
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="tb-ticker">
+      <span class="tb-dot"></span>
+      <span>EN VIVO · Música y noticias en directo, las 24 horas</span>
     </div>
+    <div class="topSocial">
+      <a data-social="facebook" href="#" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12"/></svg></a>
+      <a data-social="instagram" href="#" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+      <a data-social="whatsapp" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.38 1.26 4.8L2 22l5.44-1.36a9.9 9.9 0 0 0 4.6 1.14h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.87 9.87 0 0 0 12.04 2zm5.78 14.2c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.02.28-3.42-.72-2.9-1.2-4.77-4.15-4.92-4.34-.14-.2-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.78-.36.2 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.32.02.51-.1.2-.15.32-.3.5-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.29.75 1.24 1.62 2.01 1.12 1 2.06 1.31 2.35 1.46.29.15.46.13.63-.08.17-.2.72-.84.91-1.13.19-.29.38-.24.63-.15.25.1 1.61.76 1.89.9.28.14.46.21.53.33.07.12.07.68-.17 1.35z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CABECERA ============ -->
+<header class="siteHeader">
+  <div class="container header-inner">
+    <a class="logo" href="#inicio">
+      <span class="logo-mark"><img src="icons/icon-192.png" alt="Portal San Pedro Sur"></span>
+      <span class="logo-text">
+        <strong>PORTAL SP SUR</strong>
+        <span>La radio de San Pedro</span>
+      </span>
+    </a>
+    <nav class="mainNav">
+      <a href="#inicio" class="on">Inicio</a>
+      <a href="#noticias">Noticias</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <button id="tema-btn" class="tema-btn" aria-label="Cambiar entre tema oscuro y claro" title="Cambiar tema">
+      <svg class="ic-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+      <svg class="ic-luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg>
+    </button>
     <button id="install-btn" aria-label="Instalar aplicación">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></svg>
       <span>Instalar App</span>
     </button>
-  </header>
-
-  <div class="hero">
-    <span class="live-pill"><span class="live-dot"></span>EN DIRECTO</span>
-    <h1>PORTAL <span class="accent">SAN PEDRO SUR</span></h1>
-    <p class="tagline">Radio online · En vivo 24 horas</p>
-
-    <div class="social-row" id="social-row">
-      <a href="#" target="_blank" rel="noopener" data-social="facebook" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12"/></svg></a>
-      <a href="#" target="_blank" rel="noopener" data-social="whatsapp" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.38 1.26 4.8L2 22l5.44-1.36a9.9 9.9 0 0 0 4.6 1.14h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.87 9.87 0 0 0 12.04 2zm5.78 14.2c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.02.28-3.42-.72-2.9-1.2-4.77-4.15-4.92-4.34-.14-.2-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.78-.36.2 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.32.02.51-.1.2-.15.32-.3.5-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.29.75 1.24 1.62 2.01 1.12 1 2.06 1.31 2.35 1.46.29.15.46.13.63-.08.17-.2.72-.84.91-1.13.19-.29.38-.24.63-.15.25.1 1.61.76 1.89.9.28.14.46.21.53.33.07.12.07.68-.17 1.35z"/></svg></a>
-      <a href="#" target="_blank" rel="noopener" data-social="instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
-      <a href="#" target="_blank" rel="noopener" data-social="tiktok" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 2h-3.2v13.6a3 3 0 1 1-2.4-2.94V9.3a6.2 6.2 0 1 0 5.6 6.17V8.4a7.6 7.6 0 0 0 4.4 1.4V6.6a4.4 4.4 0 0 1-4.4-4.4z"/></svg></a>
-    </div>
   </div>
+</header>
+
+<!-- ============ PAGINA ============ -->
+<div id="home-view">
+
+  <!-- BANNER DESLIZANTE -->
+  <section class="section" id="inicio" style="padding-bottom:0;">
+    <div class="container">
+      <div class="banner-wrap">
+        <div class="banner-slider" id="bannerSlider">
+          <div class="banner-track" id="bannerTrack"></div>
+
+          <button class="bannerPrev" id="bannerPrev" aria-label="Anterior">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="bannerNext" id="bannerNext" aria-label="Siguiente">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+
+          <div class="bannerDots" id="bannerDots"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ULTIMAS NOTICIAS -->
+  <section class="section" id="noticias" style="padding-top:0;">
+    <div class="container">
+      <div class="section-strip">
+        <div class="ss-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h13a1 1 0 0 1 1 1v14a2 2 0 0 0 2 2H5a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1z"/><path d="M18 8h3v11a2 2 0 0 1-2 2"/><path d="M7 8h7M7 12h7M7 16h4"/></svg></div>
+        <div class="ss-title">Últimas noticias</div>
+        <a class="ss-link" href="#contacto">Mandanos la tuya</a>
+      </div>
+
+      <!-- Las noticias se cargan desde el arreglo NOTICIAS, mas abajo en el archivo.
+           Para agregar una: copia un objeto y cambia los datos.
+           imagen: puede ser una foto tuya en assets/noticias/ o el link de una imagen. -->
+      <div class="latest-strip" id="latestStrip"></div>
+
+      <!-- Boton que lleva a la pagina con TODAS las noticias -->
+      <div class="ver-mas-wrap">
+        <a class="ver-mas" href="noticias.html">Ver más noticias
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- EL TIEMPO -->
+  <section class="section section-alt" id="tiempo">
+    <div class="container">
+      <div class="section-strip">
+        <div class="ss-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.6A3.7 3.7 0 0 0 6.5 19z"/><path d="M8 21l1-2M13 21l1-2M18 21l1-2"/></svg></div>
+        <div class="ss-title">El tiempo</div>
+        <a class="ss-link" href="https://www.meteoblue.com/es/tiempo/semana/guajayvi_paraguay_3438034" target="_blank" rel="noopener">Ver en Meteoblue</a>
+      </div>
+
+      <!-- Pronostico real de San Pedro del Sud, traido de Open-Meteo.
+           Se actualiza solo, no hay que tocar nada. -->
+      <div class="weather-strip" id="weatherStrip">
+        <div class="weather-note">Cargando el pronóstico...</div>
+      </div>
+      <p class="weather-credit" id="weatherCredit">Pronóstico actualizado automáticamente</p>
+    </div>
+  </section>
+
+  <!-- FACEBOOK -->
+  <section class="section" id="facebook">
+    <div class="container">
+      <div class="section-strip">
+        <div class="ss-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12"/></svg></div>
+        <div class="ss-title">Seguinos en Facebook</div>
+        <a class="ss-link" id="fb-link-directo" href="#" target="_blank" rel="noopener">Abrir la pagina</a>
+      </div>
+
+      <!-- Direccion de tu pagina de Facebook.
+           La misma URL la usan el plugin de abajo y el boton "Abrir la pagina",
+           asi queda escrita una sola vez. -->
+      <div class="fb-holder">
+        <div class="fb-page"
+             data-href="https://www.facebook.com/PortalSanPedroSur"
+             data-width="380"
+             data-small-header="true"
+             data-hide-cover="true"
+             data-show-facepile="true"
+             data-show-posts="true"
+             data-locale="es_LA"></div>
+      </div>
+    </div>
+  </section>
 </div>
 
-<!-- Mini reproductor: barra inferior fija, siempre visible y funcional -->
+</div>
+
+<!-- ============ PIE ============ -->
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <img src="icons/icon-192.png" alt="Portal San Pedro Sur">
+          <span>PORTAL SP SUR</span>
+        </div>
+        <p class="foot-about">Tu compañia las 24 horas: música, actualidad y entretenimiento en vivo desde el corazón de la ciudad.</p>
+        <div class="foot-social">
+          <a data-social="facebook" href="#" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12"/></svg></a>
+          <a data-social="instagram" href="#" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+          <a data-social="whatsapp" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.38 1.26 4.8L2 22l5.44-1.36a9.9 9.9 0 0 0 4.6 1.14h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.87 9.87 0 0 0 12.04 2zm5.78 14.2c-.24.68-1.4 1.3-1.93 1.36-.5.06-1.02.28-3.42-.72-2.9-1.2-4.77-4.15-4.92-4.34-.14-.2-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.78-.36.2 0 .39 0 .56.01.18.01.42-.07.65.5.24.58.82 2 .89 2.15.07.14.12.32.02.51-.1.2-.15.32-.3.5-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.29.75 1.24 1.62 2.01 1.12 1 2.06 1.31 2.35 1.46.29.15.46.13.63-.08.17-.2.72-.84.91-1.13.19-.29.38-.24.63-.15.25.1 1.61.76 1.89.9.28.14.46.21.53.33.07.12.07.68-.17 1.35z"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <div class="foot-title">Secciones</div>
+        <div class="foot-links">
+          <a href="#inicio">Inicio</a>
+          <a href="#noticias">Noticias</a>
+          <a href="#contacto">Contacto</a>
+        </div>
+      </div>
+      <div>
+        <div class="foot-title">Contacto</div>
+        <div class="foot-links">
+          <a data-social="whatsapp" href="#" target="_blank" rel="noopener">WhatsApp</a>
+          <a href="tel:+595986436870">+595 986 436 870</a>
+          <a href="mailto:portalsanpedrosur@gmail.com">portalsanpedrosur@gmail.com</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; Portal San Pedro Sur. Todos los derechos reservados.</span>
+      <!-- UBICACION DE LA RADIO: cambiala si la radio emite desde otro lugar -->
+      <span>Guajayvi, Paraguay</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ BARRA MINI ============ -->
 <div id="mini-bar">
   <div class="mini-mark" id="mini-mark"><img src="icons/icon-192.png" alt="Portal San Pedro Sur"></div>
   <div class="mini-info" id="mini-open-target">
     <div class="t1 mini-marquee" id="mini-title">Portal San Pedro Sur</div>
-    <div class="t2" id="mini-subtitle">Toca para abrir el reproductor</div>
+    <div class="t2" id="mini-subtitle">Tocá para abrir el reproductor</div>
   </div>
   <div class="eq paused" id="mini-eq">
     <span></span><span></span><span></span><span></span><span></span>
@@ -572,58 +904,81 @@
   </button>
 </div>
 
-<!-- ============ VISTA 2: REPRODUCTOR COMPLETO ============ -->
+<!-- ============ REPRODUCTOR ============ -->
 <div id="player-view">
   <div class="player-top">
     <button id="back-btn" aria-label="Volver">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     </button>
+    <span class="pt-title">Reproductor</span>
   </div>
-
   <div class="player-body">
-
     <div class="disc-wrap">
       <div class="disc" id="disc">
         <div class="disc-core"><img src="icons/icon-192.png" alt="Portal San Pedro Sur"></div>
       </div>
     </div>
-
     <div class="station-info">
       <h1>Portal San Pedro Sur</h1>
-      <p>Radio online · En vivo 24 horas</p>
-      <div id="track-title">Cargando transmisión…</div>
+      <p>Transmisión en vivo · 24 horas</p>
+      <div id="track-title">Cargando transmisión...</div>
     </div>
-
-    <span class="on-air-banner">SONANDO EN VIVO</span>
-
     <div class="controls">
       <button class="btn-round btn-small" id="mute-btn" title="Silenciar" aria-label="Silenciar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+        <svg id="mute-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
       </button>
-
       <button class="btn-round" id="play-btn" title="Reproducir" aria-label="Reproducir">
         <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
         <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="5" y="3" width="5" height="18"></rect><rect x="14" y="3" width="5" height="18"></rect></svg>
       </button>
-
       <button class="btn-round btn-small" id="reload-btn" title="Reconectar" aria-label="Reconectar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
       </button>
     </div>
-
     <div class="volume-row">
-      <span>🔈</span>
-      <input type="range" id="volume" min="0" max="100" value="80">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+      <input type="range" id="volume" min="0" max="1" step="0.01" value="1" aria-label="Volumen">
     </div>
-
     <div id="status-msg">Sin transmisión configurada</div>
   </div>
 </div>
 
 <audio id="audio" preload="none"></audio>
-<audio id="intro-audio" preload="auto" src="assets/intro.mp3"></audio>
 
 <script>
+  /* ================================================================
+     TEMA: la pagina arranca en oscuro. El boton de la cabecera lo
+     cambia a claro y al reves. Lo que elija se recuerda para la
+     proxima visita.
+     ================================================================ */
+  (function(){
+    var raiz  = document.documentElement;
+    var boton = document.getElementById('tema-btn');
+    var meta  = document.querySelector('meta[name="theme-color"]');
+    var CLAVE = 'ppsp-tema';
+
+    function aplicar(t){
+      raiz.setAttribute('data-tema', t);
+      try { localStorage.setItem(CLAVE, t); } catch(e){}
+      if (meta) meta.setAttribute('content', '#f97316');
+      if (boton){
+        boton.setAttribute('aria-label',
+          t === 'oscuro' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+      }
+    }
+
+    // lo que eligio la ultima vez; si nunca, tema oscuro
+    var guardado = null;
+    try { guardado = localStorage.getItem(CLAVE); } catch(e){}
+    aplicar(guardado === 'claro' ? 'claro' : 'oscuro');
+
+    if (boton){
+      boton.addEventListener('click', function(){
+        aplicar(raiz.getAttribute('data-tema') === 'oscuro' ? 'claro' : 'oscuro');
+      });
+    }
+  })();
+
   /* ================================================================
      CONFIGURACIÓN — edita aquí la URL del stream y las redes sociales
      ================================================================ */
@@ -932,84 +1287,27 @@
   audio.addEventListener('playing', () => { statusMsg.textContent = 'Transmitiendo en vivo'; });
 
   /* ================================================================
-     BLOQUEO DE SCROLL / REBOTE — asegura que la pantalla de inicio
-     nunca se pueda deslizar hacia abajo en navegadores móviles.
-     El reproductor de pantalla completa sí permite scroll interno
-     por si el contenido no cabe en pantallas muy pequeñas.
+     SCROLL
+     Antes habia un touchmove con preventDefault que CONGELABA la pagina
+     entera en el movil (no se podia deslizar hacia abajo). Se elimino:
+     ahora la pagina se desplaza normalmente con el dedo.
      ================================================================ */
-  document.addEventListener('touchmove', (e) => {
-    if(!e.target.closest('#player-view') && !e.target.closest('input[type=range]')){
-      e.preventDefault();
-    }
-  }, { passive:false });
 
   /* ================================================================
-     BIENVENIDA + SPLASH + AUDIO DE INTRO
+     BIENVENIDA — solo para desbloquear el audio del navegador
      -----------------------------------------------------------------
-     - En NAVEGADOR (no instalada): se muestra la pantalla de bienvenida
-       con el botón "ENTRAR". Al tocarlo, arranca el splash con el logo
-       y se reproduce el MP3 de intro. Cuando el audio termina, el
-       splash se oculta y aparece el reproductor.
-     - Instalada como APP (PWA / modo standalone): se salta la pantalla
-       de "ENTRAR" y arranca directo el splash + audio de intro.
+     - En NAVEGADOR: se pide un toque con el botón "ENTRAR" porque
+       el navegador bloquea el audio automático. Después entra directo.
+     - Instalada como APP (PWA): se salta la pantalla y entra directo.
+     - Sin splash, sin MP3 de intro: se entra a la portada al instante.
      ================================================================ */
-  const welcomeGate   = document.getElementById('welcome-gate');
-  const enterBtn      = document.getElementById('enter-btn');
-  const splash        = document.getElementById('splash-screen');
-  const introAudio    = document.getElementById('intro-audio');
-  const tapFallback   = document.getElementById('splash-tap-fallback');
-
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-                        || window.navigator.standalone === true;
-
-  let splashDone = false;
-  function finishSplash(){
-    if(splashDone) return;
-    splashDone = true;
-    splash.classList.remove('show');
-  }
-
-  function startIntro(){
-    splash.classList.add('show');
-    introAudio.currentTime = 0;
-    const playPromise = introAudio.play();
-    if(playPromise && playPromise.catch){
-      playPromise.catch(() => {
-        // El navegador bloqueó el audio automático (puede pasar incluso
-        // en modo instalado). Mostramos un toque de respaldo para
-        // continuar sin dejar a la persona esperando indefinidamente.
-        tapFallback.classList.add('show');
-        const resumeOnTap = () => {
-          tapFallback.classList.remove('show');
-          introAudio.play().catch(() => {});
-          splash.removeEventListener('click', resumeOnTap);
-        };
-        splash.addEventListener('click', resumeOnTap);
-      });
-    }
-  }
-
-  introAudio.addEventListener('ended', finishSplash);
-  introAudio.addEventListener('error', finishSplash);
-  // Respaldo por si el audio no carga o el evento tarda demasiado
-  setTimeout(finishSplash, 15000);
-
-  if(isStandalone){
-    // App instalada: se salta el botón "Entrar" y arranca directo
-    welcomeGate.style.display = 'none';
-    startIntro();
-  } else {
-    // Navegador normal: primero pide el toque (requerido para poder
-    // reproducir audio con sonido)
-    enterBtn.addEventListener('click', () => {
-      welcomeGate.classList.add('hide');
-      startIntro();
-    });
-  }
 
   /* ================================================================
      PWA — instalación y service worker
      ================================================================ */
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                        || window.navigator.standalone === true;
+
   const installBtn = document.getElementById('install-btn');
   let deferredPrompt = null;
 
@@ -1060,6 +1358,362 @@
       window.location.reload();
     });
   }
+</script>
+<script>
+  /* Botones que abren el reproductor */
+  document.querySelectorAll('[data-open-player]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      document.getElementById('player-view').classList.add('open');
+    });
+  });
+
+  /* El link "Abrir la pagina" toma la misma URL que el plugin de Facebook,
+     asi la direccion queda escrita una sola vez. */
+  (function(){
+    var fb = document.querySelector('.fb-page');
+    var directa = document.getElementById('fb-link-directo');
+    if(fb && directa) directa.href = fb.getAttribute('data-href');
+  })();
+
+  /* Resalta el enlace de navegacion segun la seccion visible */
+  (function(){
+    var links = Array.prototype.slice.call(document.querySelectorAll('.mainNav a'));
+    var secs  = links.map(function(a){ return document.querySelector(a.getAttribute('href')); })
+                     .filter(Boolean);
+    if(!secs.length || !('IntersectionObserver' in window)) return;
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(!en.isIntersecting) return;
+        links.forEach(function(a){
+          a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id);
+        });
+      });
+    }, { rootMargin:'-45% 0px -50% 0px' });
+    secs.forEach(function(s){ obs.observe(s); });
+  })();
+</script>
+
+
+<script>
+  /* ================================================================
+     NOTICIAS — edita solo este arreglo.
+     - imagen : ruta de tu foto (assets/noticias/mi-foto.jpg) o link de imagen.
+                Si no hay foto, se muestra el texto de "resaltar".
+     - link   : a donde lleva el oyente (la nota original).
+     - fuente : nombre al que se le acredita.
+     ================================================================ */
+  var NOTICIAS = [
+    {
+      tag: "Política",
+      cuando: "hoy",
+      titulo: "#Capiibary | Culpán al intendente de la derrota del domingo",
+      resumen: "",
+      imagen: "https://i.ibb.co/TZ3VgbH/noticia-1.png",
+      link: "noticia.html",
+      fuente: "Portal San Pedro Sur"
+    },
+    {
+      tag: "Sucesos",
+      cuando: "hace 2 h",
+      titulo: "La caída de Junior Polaco Delvalle: De barbero a jefe de asaltantes y detenido por el crimen de Rebeca",
+      resumen: "",
+      imagen: "assets/noticias/noticia-1.webp",
+      link: "https://www.ultimahora.com/",
+      fuente: "Ultima Hora"
+    },
+    {
+      tag: "Política",
+      cuando: "hace 5 h",
+      titulo: "Soledad Núñez es proclamada intendenta de Asunción",
+      resumen: "",
+      imagen: "assets/noticias/noticia-2.webp",
+      link: "https://www.ultimahora.com/",
+      fuente: "Ultima Hora"
+    },
+    {
+      tag: "Cultura",
+      cuando: "ayer",
+      titulo: "83 años del guaraní: Las historias detrás de una de las monedas más antiguas de Sudamérica",
+      resumen: "",
+      imagen: "assets/noticias/noticia-3.webp",
+      link: "https://www.ultimahora.com/",
+      fuente: "Ultima Hora"
+    },
+    {
+      tag: "Judicial",
+      cuando: "hoy",
+      titulo: "Abogados piden a la Corte anular la matrícula del “alumno fantasma” Hernán Rivas",
+      resumen: "",
+      imagen: "assets/noticias/noticia-4.webp",
+      link: "https://www.abc.com.py/",
+      fuente: "ABC Color"
+    },
+    {
+      tag: "Deportes",
+      cuando: "hoy",
+      titulo: "Messi, ante el último baile con Argentina en una fiesta sin precedentes",
+      resumen: "",
+      imagen: "assets/noticias/noticia-5.webp",
+      link: "https://www.abc.com.py/",
+      fuente: "ABC Color"
+    },
+    {
+      tag: "Clima",
+      cuando: "hoy",
+      titulo: "MEC aplica plan de contingencia por tormentas: ¿se suspenden las clases?",
+      resumen: "",
+      imagen: "assets/noticias/noticia-6.webp",
+      link: "https://www.abc.com.py/",
+      fuente: "ABC Color"
+    },
+    {
+      tag: "Sucesos",
+      cuando: "hoy",
+      titulo: "Capturan a otro involucrado en el homicidio de Rebeca Martínez en Eusebio Ayala",
+      resumen: "",
+      imagen: "assets/noticias/noticia-7.webp",
+      link: "https://www.ultimahora.com/capturan-a-otro-involucrado-en-el-homicidio-de-rebeca-martinez-en-eusebio-ayala",
+      fuente: "Ultima Hora"
+    }
+  ];
+
+  /* ================================================================
+     BANNERS DE LA MARCA — estos tambien entran al carrusel.
+     imagen: "" para el fondo degradado, o una foto tuya para usarla de fondo.
+     ================================================================ */
+  var BANNERS = [
+    {
+      tag: "En vivo",
+      titulo: "La radio de San Pedro del Sur, las 24 horas",
+      texto: "Musica, noticias y la mejor compania de la ciudad, todos los dias.",
+      imagen: "",
+      link: ""
+    },
+    {
+      tag: "Noticias",
+      titulo: "Informacion al instante, de la mano de tu radio",
+      texto: "Noticias locales, del departamento y del pais, contadas apenas suceden.",
+      imagen: "",
+      link: ""
+    },
+    {
+      tag: "Instalala",
+      titulo: "Portal San Pedro Sur en tu celular",
+      texto: "Instalala como app y escuchanos sin salir de la pantalla de inicio.",
+      imagen: "",
+      link: ""
+    }
+  ];
+
+  function limpiar(s){
+    return String(s == null ? '' : s).replace(/"/g, '&quot;');
+  }
+
+  /* ---- tarjetas de noticias ---- */
+  (function(){
+    var cont = document.getElementById('latestStrip');
+    if(!cont) return;
+
+    cont.innerHTML = NOTICIAS.map(function(n){
+      var img = n.imagen
+        ? '<img src="' + n.imagen + '" alt="' + limpiar(n.titulo) + '" loading="lazy" onerror="this.style.display=\'none\'">'
+        : '';
+      var marca = n.imagen ? '' : '<span class="fallback">' + limpiar(n.tag || 'Noticia') + '</span>';
+      if(!n.titulo || !String(n.titulo).trim()) return '';
+      return '<article class="news-card">'
+        +   '<div class="nc-img">' + img + marca
+        +     (n.fuente ? '<span class="nc-src">' + limpiar(n.fuente) + '</span>' : '')
+        +   '</div>'
+        +   '<div class="nc-body">'
+        +     '<div class="nc-top"><span class="nc-tag">' + limpiar(n.tag) + '</span>'
+        +     '<span class="nc-time">' + limpiar(n.cuando) + '</span></div>'
+        +     '<div class="nc-title">' + limpiar(n.titulo) + '</div>'
+        +     (n.resumen ? '<div class="nc-text">' + limpiar(n.resumen) + '</div>' : '')
+        +     '<a class="nc-link" href="' + n.link + '" target="_blank" rel="noopener">Leer la nota completa'
+        +       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>'
+        +     '</a>'
+        +   '</div>'
+        + '</article>';
+    }).join('');
+  })();
+
+  /* ================================================================
+     EL TIEMPO — pronostico real de San Pedro del Sur.
+     Viene de Open-Meteo: gratis, sin clave y con permiso para leerlo
+     desde el navegador. Se actualiza solo, no hay que tocar nada.
+     ================================================================ */
+  (function(){
+    var cont = document.getElementById('weatherStrip');
+    if(!cont) return;
+
+    var NUBL = 'M7 18a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.6-1.4A3.8 3.8 0 0 1 18 18z';
+    var GOTA = 'M12 2.5s5.5 7 5.5 10.5a5.5 5.5 0 0 1-11 0C6.5 9.5 12 2.5 12 2.5z';
+    var SOL  = 'M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4';
+    var RAYO = 'M7 14a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.6-1.4A3.8 3.8 0 0 1 18 14zM13 13l-3 5h4l-3 5';
+
+    function clima(cod){
+      if(cod === 0) return ['Despejado', SOL];
+      if(cod === 1) return ['Mayormente soleado', SOL + NUBL];
+      if(cod === 2) return ['Parcialmente nublado', SOL + NUBL];
+      if(cod === 3) return ['Nublado', NUBL];
+      if(cod === 45 || cod === 48) return ['Niebla', 'M4 9h16M6 13h12M4 17h16'];
+      if(cod >= 51 && cod <= 57) return ['Llovizna', NUBL + GOTA];
+      if(cod >= 61 && cod <= 67) return ['Lluvia', NUBL + GOTA];
+      if(cod >= 71 && cod <= 77) return ['Nieve', NUBL + 'M8 18h.01M12 18h.01M16 18h.01'];
+      if(cod >= 80 && cod <= 84) return ['Chubascos', NUBL + GOTA];
+      if(cod >= 95) return ['Tormenta', NUBL + RAYO];
+      return ['Variable', NUBL];
+    }
+
+    function icono(d){
+      return '<svg class="wicon" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+           + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+           + '<path d="' + d + '"/></svg>';
+    }
+
+    /* ── LUGAR DEL PRONOSTICO ──────────────────────────────────
+       Cambia SOLO estas 3 lineas para poner otro lugar.
+       Coordenadas verificadas (latitud, longitud):
+         · Guajayi, Paraguay ......... -24.5292 , -56.4066
+         · Asuncion .................. -25.2637 , -57.5759
+       (busca las tuyas en open-meteo.com clicking en la ciudad)
+       ────────────────────────────────────────────────────────── */
+    var LUGAR = {
+      nombre: 'Guajayvi, Paraguay',
+      lat: -24.5333,
+      lon: -56.4039
+    };
+
+    var DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    var url = 'https://api.open-meteo.com/v1/forecast'
+            + '?latitude=' + LUGAR.lat + '&longitude=' + LUGAR.lon
+            + '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode'
+            + '&timezone=America%2FAsuncion&forecast_days=5';
+
+    var credit = document.getElementById('weatherCredit');
+    if (credit) credit.textContent = 'Pronóstico de ' + LUGAR.nombre + ' · actualizado automáticamente';
+
+    fetch(url)
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if(!j.daily || !j.daily.time) throw new Error('sin datos');
+        var d = j.daily;
+        var hoy = new Date().toDateString();
+
+        cont.innerHTML = d.time.map(function(fecha, i){
+          var p = fecha.split('-');
+          var dia = new Date(p[0], Number(p[1]) - 1, Number(p[2]));
+          var esHoy = dia.toDateString() === hoy;
+          var info = clima(d.weathercode[i]);
+          var lluvia = d.precipitation_probability_max[i];
+
+          return '<div class="wcard' + (esHoy ? ' hoy' : '') + '">'
+            +   '<div class="wday">' + (esHoy ? 'Hoy' : DIAS[dia.getDay()]) + '</div>'
+            +   icono(info[1])
+            +   '<div class="wdesc">' + info[0] + '</div>'
+            +   '<div class="wtemp"><span class="max">' + Math.round(d.temperature_2m_max[i]) + '°</span>'
+            +     '<span class="min">' + Math.round(d.temperature_2m_min[i]) + '°</span></div>'
+            +   (lluvia != null
+                  ? '<span class="wrain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+                    + ' stroke-width="1.7" stroke-linecap="round"><path d="' + GOTA + '"/></svg>'
+                    + lluvia + '%</span>'
+                  : '')
+            + '</div>';
+        }).join('');
+      })
+      .catch(function(){
+        cont.innerHTML = '<div class="weather-note">No se pudo cargar el pronóstico.'
+                        + ' Abrí "Ver en Meteoblue" para verlo igual.</div>';
+      });
+  })();
+
+  /* ================================================================
+     CARRUSEL — banners de la marca + TODAS las noticias
+     ================================================================ */
+  (function(){
+    var track = document.getElementById('bannerTrack');
+    var dots  = document.getElementById('bannerDots');
+    if(!track || !dots) return;
+
+    // solo entran los slides que TIENEN contenido real:
+    // deben tener titular Y imagen. Si no, no se muestran.
+    var slides = BANNERS.concat(NOTICIAS).filter(function(s){
+      return s &&
+             String(s.titulo || '').trim() !== '' &&
+             String(s.imagen || '').trim() !== '';
+    });
+
+    if (slides.length === 0){
+      track.innerHTML = '';
+      dots.innerHTML = '';
+      if (prev) prev.style.display = 'none';
+      if (next) next.style.display = 'none';
+      return;
+    }
+
+    track.innerHTML = slides.map(function(s){
+      var esNoticia = !!s.fuente;
+      // foto a pantalla completa + fondo oscuro de respaldo,
+      // asi nunca queda en blanco aunque la imagen no cargue
+      var marco = '<div class="bg dark"></div>'
+        +   '<img class="bs-img" src="' + s.imagen +
+               '" alt="" onerror="this.style.display=\'none\'">'
+        +   (esNoticia ? '<span class="banner-fuente">' + limpiar(s.fuente) + '</span>' : '');
+      var cuerpo = '<div class="banner-content">'
+        +   '<span class="banner-tag">' + limpiar(s.tag) + '</span>'
+        +   '<h3>' + limpiar(s.titulo) + '</h3>'
+        +   (s.texto || s.resumen ? '<p>' + limpiar(s.texto || s.resumen) + '</p>' : '')
+        + '</div>';
+      return esNoticia
+        ? '<a class="banner-slide link" href="' + s.link + '" target="_blank" rel="noopener">' + marco + cuerpo + '</a>'
+        : '<div class="banner-slide">' + marco + cuerpo + '</div>';
+    }).join('');
+
+    dots.innerHTML = slides.map(function(_, i){
+      return '<button' + (i === 0 ? ' class="on"' : '') + ' aria-label="Slide ' + (i + 1) + '"></button>';
+    }).join('');
+
+    var total = slides.length;
+    var actual = 0;
+    var timer = null;
+
+    function irA(i){
+      actual = (i + total) % total;
+      track.style.transform = 'translateX(-' + (actual * 100) + '%)';
+      Array.prototype.forEach.call(dots.children, function(d, k){
+        d.classList.toggle('on', k === actual);
+      });
+    }
+    function arrancar(){
+      parar();
+      timer = setInterval(function(){ irA(actual + 1); }, 6000);
+    }
+    function parar(){ if(timer) clearInterval(timer); }
+
+    var prev = document.getElementById('bannerPrev');
+    var next = document.getElementById('bannerNext');
+    if(prev) prev.addEventListener('click', function(){ irA(actual - 1); arrancar(); });
+    if(next) next.addEventListener('click', function(){ irA(actual + 1); arrancar(); });
+    Array.prototype.forEach.call(dots.children, function(d, k){
+      d.addEventListener('click', function(){ irA(k); arrancar(); });
+    });
+
+    // pausa el giro cuando el raton esta encima o en un celular con el dedo
+    var slider = document.getElementById('bannerSlider');
+    if(slider){
+      slider.addEventListener('mouseenter', parar);
+      slider.addEventListener('mouseleave', arrancar);
+      slider.addEventListener('touchstart', parar, { passive:true });
+    }
+
+    // si la pestaña no esta a la vista, no gastar rotation
+    document.addEventListener('visibilitychange', function(){
+      if(document.hidden) parar(); else arrancar();
+    });
+
+    arrancar();
+  })();
 </script>
 
 </body>
