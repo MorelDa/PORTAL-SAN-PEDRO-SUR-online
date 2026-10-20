@@ -1,96 +1,35 @@
-/*
-  Service Worker — Portal San Pedro Sur
-  ---------------------------------------------------------------
-  IMPORTANTE: sube el número de CACHE_VERSION cada vez que subas
-  cambios nuevos (por ejemplo v2, v3...). Esto obliga a los
-  navegadores de tus oyentes a descargar la versión nueva en vez
-  de quedarse con una copia vieja guardada en caché.
-  ---------------------------------------------------------------
-*/
-const CACHE_VERSION = 'v31';
-const CACHE_NAME = `portal-san-pedro-sur-${CACHE_VERSION}`;
+// Sitio cerrado: el aviso "WEB CERRADA" se muestra en TODAS las navegaciones.
+// Asi las apps instaladas y las visitas con cache vieja tambien ven el cierre.
+const CACHE = "pps-cerrado-v1";
+const AVISO = "/index.html";
+const PAGINAS = [AVISO, "/noticias.html", "/noticia.html"];
 
-// Archivos "estáticos" que se pueden guardar en caché sin problema
-const PRECACHE_ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './assets/noticias/noticia-1.webp',
-  './assets/noticias/noticia-2.webp',
-  './assets/noticias/noticia-3.webp',
-  './assets/noticias/noticia-4.webp',
-  './assets/noticias/noticia-5.webp',
-  './assets/noticias/noticia-6.webp',
-  './assets/noticias/noticia-7.webp',
-  './icons/icon-192.png',
-  './icons/icon-384.png',
-  './icons/icon-512.png',
-  './icons/apple-touch-icon.png',
-  './icons/favicon-32x32.png',
-  './icons/favicon-16x16.png',
-  './icons/favicon.ico',
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS))
+self.addEventListener("install", (e) => {
+  e.waitUntil(
+    caches.open(CACHE)
+      .then((c) => c.addAll(PAGINAS))
+      .then(() => self.skipWaiting())
   );
-  // Activa el nuevo SW de inmediato, sin esperar a que se cierren las pestañas viejas
-  self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
-    )
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys()
+      .then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  // Toma control de todas las pestañas abiertas de inmediato
-  self.clients.claim();
 });
 
-self.addEventListener('fetch', (event) => {
-  const req = event.request;
-  const url = new URL(req.url);
-
-  // Nunca cachear el stream de audio en vivo
-  if (req.destination === 'audio' || url.pathname.includes('listen.php') || url.hostname.includes('stream.espora.org')) {
+self.addEventListener("fetch", (e) => {
+  if (e.request.mode === "navigate") {
+    e.respondWith(caches.match(AVISO).then((r) => r || fetch(AVISO)));
     return;
   }
-
-  // HTML / navegación: red primero, con respaldo en caché si no hay internet.
-  // Así, cuando subes cambios nuevos, el visitante los ve de inmediato.
-  if (req.mode === 'navigate' || req.destination === 'document') {
-    event.respondWith(
-      fetch(req)
-        .then((res) => {
-          const resClone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
-          return res;
-        })
-        .catch(() => caches.match(req).then((res) => res || caches.match('./index.html')))
-    );
-    return;
-  }
-
-  // Resto de archivos estáticos (íconos, manifest, fuentes, intro): caché primero,
-  // y se actualiza en segundo plano para la próxima vez.
-  event.respondWith(
-    caches.match(req).then((cached) => {
-      const fetchPromise = fetch(req)
-        .then((res) => {
-          if (res && res.status === 200) {
-            const resClone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
-          }
-          return res;
-        })
-        .catch(() => cached);
-      return cached || fetchPromise;
-    })
+  e.respondWith(
+    caches.match(e.request).then((r) => r || fetch(e.request).then((resp) => {
+      const copia = resp.clone();
+      caches.open(CACHE).then((c) => c.put(e.request, copia));
+      return resp;
+    }).catch(() => caches.match(AVISO)))
   );
 });
